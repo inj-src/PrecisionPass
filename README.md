@@ -1,2 +1,2 @@
 # PrecisionPass
-An integrated system for CV based check in.  
+An integrated orchestration of CV-based Presence Tracking System.
