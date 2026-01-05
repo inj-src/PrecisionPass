@@ -39,10 +39,10 @@ import {
 
 const mainNavItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: Users, label: "Employees", href: "/employees" },
+  // { icon: Users, label: "Employees", href: "/employees" },
   { icon: ScanFace, label: "Face Registry", href: "/face-registration" },
-  { icon: Calendar, label: "Schedules", href: "/schedules" },
-  { icon: FileBarChart, label: "Reports", href: "/reports" },
+  // { icon: Calendar, label: "Schedules", href: "/schedules" },
+  // { icon: FileBarChart, label: "Reports", href: "/reports" },
 ];
 
 const bottomNavItems = [
@@ -106,7 +106,7 @@ export function AppSidebar({ user = { name: "Alex Smith", initials: "AS" } }: Ap
       {/* Sidebar Footer */}
       <SidebarFooter className="mt-auto">
         {/* System Health Card */}
-        <div className="px-4 pb-4 group-data-[collapsible=icon]:hidden">
+        {/* <div className="px-4 pb-4 group-data-[collapsible=icon]:hidden">
           <Card className="bg-muted/50 border-none shadow-none">
             <CardHeader className="p-4 pb-2">
               <CardTitle className="text-sm font-semibold">System Health</CardTitle>
@@ -125,7 +125,7 @@ export function AppSidebar({ user = { name: "Alex Smith", initials: "AS" } }: Ap
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
         <SidebarSeparator />
 
