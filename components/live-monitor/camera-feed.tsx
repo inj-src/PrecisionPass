@@ -1,14 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-   Video,
-   Maximize2,
-   Pause,
-   Play,
-   Volume2,
-   VolumeX,
-} from "lucide-react";
+import { Video, Maximize2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -40,8 +33,6 @@ export function CameraFeed({
    boundingBoxes = [],
    onFullscreen,
 }: CameraFeedProps) {
-   const [isPlaying, setIsPlaying] = React.useState(true);
-   const [isMuted, setIsMuted] = React.useState(false);
    const [currentTime, setCurrentTime] = React.useState(new Date());
 
    // Update time every second
@@ -114,51 +105,15 @@ export function CameraFeed({
                <BoundingBoxOverlay key={box.id} box={box} />
             ))}
 
-            {/* Timestamp Overlay */}
-            <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-md border border-white/10">
-               <span className="text-white font-mono text-sm">
-                  {formatDate(currentTime)}{" "}
-                  <span className="text-zinc-400 ml-2">{formatTime(currentTime)}</span>
-               </span>
-            </div>
          </CardContent>
 
          {/* Controls Footer */}
          <div className="h-12 bg-card border-t flex items-center px-4 justify-between">
             <div className="flex items-center gap-4">
-               <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setIsPlaying(!isPlaying)}
-               >
-                  {isPlaying ? (
-                     <Pause className="h-4 w-4" />
-                  ) : (
-                     <Play className="h-4 w-4" />
-                  )}
-               </Button>
-               <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setIsMuted(!isMuted)}
-               >
-                  {isMuted ? (
-                     <VolumeX className="h-4 w-4" />
-                  ) : (
-                     <Volume2 className="h-4 w-4" />
-                  )}
-               </Button>
-               {/* Audio Level Bar */}
-               <div className="h-1 w-20 bg-muted rounded-full overflow-hidden">
-                  <div
-                     className={cn(
-                        "h-full bg-success transition-all duration-300",
-                        isMuted ? "w-0" : "w-2/3"
-                     )}
-                  />
-               </div>
+               <span className="text-sm font-mono text-foreground">
+                  {formatDate(currentTime)}{" "}
+                  <span className="text-muted-foreground ml-2">{formatTime(currentTime)}</span>
+               </span>
             </div>
 
             <div className="text-xs text-muted-foreground font-medium">
