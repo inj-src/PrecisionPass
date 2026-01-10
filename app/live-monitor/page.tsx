@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  LiveMonitorHeader,
-  CameraFeed,
-  RecognitionFeed,
-  StatCard,
-  Recognition,
-} from "@/components/live-monitor";
+import { LiveMonitorHeader } from "@/components/live-monitor/live-monitor-header";
+import { CameraFeed } from "@/components/live-monitor/camera-feed";
+import { RecognitionFeed, Recognition } from "@/components/live-monitor/recognition-feed";
+import { StatCard } from "@/components/live-monitor/stat-card";
 
 // Mock recognition data
 const mockRecognitions: Recognition[] = [
