@@ -17,21 +17,11 @@ interface BoundingBox {
 }
 
 interface CameraFeedProps {
-   streamName?: string;
-   resolution?: string;
-   fps?: number;
-   latency?: number;
    boundingBoxes?: BoundingBox[];
-   onFullscreen?: () => void;
 }
 
 export function CameraFeed({
-   streamName = "Main Entrance Stream",
-   resolution = "1920x1080",
-   fps = 60,
-   latency = 24,
    boundingBoxes = [],
-   onFullscreen,
 }: CameraFeedProps) {
    const [currentTime, setCurrentTime] = React.useState(new Date());
 
@@ -59,23 +49,15 @@ export function CameraFeed({
    return (
       <Card className="flex flex-col h-full overflow-hidden py-0 gap-0">
          {/* Stream Header */}
-         <CardHeader className="py-3 px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
+         <CardHeader className="py-5 px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
             <div className="flex items-center gap-2">
                <Video className="h-4 w-4 text-muted-foreground" />
-               <span className="text-sm font-medium">{streamName}</span>
+               <span className="text-sm font-medium">Camera Stream</span>
             </div>
             <div className="flex items-center gap-3">
                <span className="text-xs text-muted-foreground font-mono">
-                  {resolution} • {fps}FPS
+                  1920x1080 • 60FPS
                </span>
-               <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={onFullscreen}
-               >
-                  <Maximize2 className="h-4 w-4" />
-               </Button>
             </div>
          </CardHeader>
 
@@ -120,10 +102,10 @@ export function CameraFeed({
                Latency:{" "}
                <span
                   className={cn(
-                     latency < 50 ? "text-success" : latency < 100 ? "text-warning" : "text-destructive"
+                     25 < 50 ? "text-success" : 25 < 100 ? "text-warning" : "text-destructive"
                   )}
                >
-                  {latency}ms
+                  {25}ms
                </span>
             </div>
          </div>

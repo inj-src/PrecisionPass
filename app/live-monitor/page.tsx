@@ -3,7 +3,6 @@
 import { LiveMonitorHeader } from "@/components/live-monitor/live-monitor-header";
 import { CameraFeed } from "@/components/live-monitor/camera-feed";
 import { RecognitionFeed, Recognition } from "@/components/live-monitor/recognition-feed";
-import { StatCard } from "@/components/live-monitor/stat-card";
 
 // Mock recognition data
 const mockRecognitions: Recognition[] = [
@@ -87,9 +86,6 @@ export default function LiveMonitorPage() {
     <>
       {/* Header */}
       <LiveMonitorHeader
-        cameraName="Main Entrance (Cam 01)"
-        onAddCamera={() => console.log("Add camera")}
-        onSettings={() => console.log("Settings")}
       />
 
       {/* Main Content */}
@@ -98,30 +94,12 @@ export default function LiveMonitorPage() {
           {/* Camera Feed - Takes most of the space */}
           <div className="flex-1 min-w-0">
             <CameraFeed
-              streamName="Main Entrance Stream"
-              resolution="1920x1080"
-              fps={60}
-              latency={24}
               boundingBoxes={mockBoundingBoxes}
-              onFullscreen={() => console.log("Fullscreen")}
             />
           </div>
 
           {/* Right Sidebar */}
           <div className="w-full lg:w-96 flex flex-col gap-4 shrink-0">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <StatCard
-                label="Present Today"
-                value={42}
-                subtitle="/ 58"
-              />
-              <StatCard
-                label="Late Arrivals"
-                value={3}
-                variant="warning"
-              />
-            </div>
 
             {/* Recognition Feed - Grows to fill remaining space */}
             <div className="flex-1 min-h-0">

@@ -1,20 +1,8 @@
 "use client";
 
-import { Settings2, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
-interface LiveMonitorHeaderProps {
-  cameraName?: string;
-  onAddCamera?: () => void;
-  onSettings?: () => void;
-}
-
-export function LiveMonitorHeader({
-  cameraName = "Main Entrance (Cam 01)",
-  onAddCamera,
-  onSettings,
-}: LiveMonitorHeaderProps) {
+export function LiveMonitorHeader() {
   return (
     <header className="flex items-center justify-between px-6 py-4 border-b bg-background shrink-0">
       <div className="flex items-center gap-4">
@@ -24,8 +12,7 @@ export function LiveMonitorHeader({
         <div>
           <h1 className="text-xl font-bold text-foreground">Live Camera Feed</h1>
           <p className="text-sm text-muted-foreground">
-            Monitoring:{" "}
-            <span className="text-success font-medium">{cameraName}</span>
+            Monitoring live camera feed
           </p>
         </div>
       </div>
@@ -42,16 +29,6 @@ export function LiveMonitorHeader({
           </span>
         </div>
 
-        {/* Settings Button */}
-        <Button variant="outline" size="icon" onClick={onSettings}>
-          <Settings2 className="h-4 w-4" />
-        </Button>
-
-        {/* Add Camera Button */}
-        <Button onClick={onAddCamera} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Camera
-        </Button>
       </div>
     </header>
   );
