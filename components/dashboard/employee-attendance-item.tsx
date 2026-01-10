@@ -39,10 +39,8 @@ const statusConfig = {
 
 export function EmployeeAttendanceItem({
   employee,
-  onLogReason,
 }: EmployeeAttendanceItemProps) {
   const config = statusConfig[employee.status];
-
   return (
     <div className="flex items-center justify-between py-4 border-b last:border-b-0">
       <div className="flex items-center gap-4">
@@ -95,8 +93,7 @@ export function EmployeeAttendanceItem({
 
       {/* Time / Action */}
       <div className="text-right">
-        {employee.checkInTime ? (
-          <>
+
             <p className="font-medium text-foreground">{employee.checkInTime}</p>
             <p
               className={cn(
@@ -110,18 +107,7 @@ export function EmployeeAttendanceItem({
                 ? `+${employee.lateMinutes}m late`
                 : "Check-in"}
             </p>
-          </>
-        ) : (
-          <>
-            <p className="font-medium text-muted-foreground">--:--</p>
-            <button
-              onClick={() => onLogReason?.(employee.id)}
-              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
-            >
-              Log Reason
-            </button>
-          </>
-        )}
+
       </div>
     </div>
   );

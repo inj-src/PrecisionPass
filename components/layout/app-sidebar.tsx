@@ -1,16 +1,13 @@
 "use client";
 
-import * as React from "react";
 import {
-  Search,
   LayoutDashboard,
   Users,
   ScanFace,
-  Calendar,
-  FileBarChart,
   Settings,
   LogOut,
   ChevronDown,
+  Video,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,21 +25,13 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 
 const mainNavItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  // { icon: Users, label: "Employees", href: "/employees" },
+  { icon: Video, label: "Live Monitor", href: "/live-monitor" },
+  { icon: Users, label: "Employees", href: "/employees" },
   { icon: ScanFace, label: "Face Registry", href: "/face-registration" },
-  // { icon: Calendar, label: "Schedules", href: "/schedules" },
-  // { icon: FileBarChart, label: "Reports", href: "/reports" },
 ];
 
 const bottomNavItems = [
@@ -68,7 +57,7 @@ export function AppSidebar({ user = { name: "Alex Smith", initials: "AS" } }: Ap
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback className="bg-gradient-to-br from-amber-400 to-orange-500 text-white font-semibold text-sm">
+            <AvatarFallback className="bg-linear-to-br from-amber-400 to-orange-500 text-white font-semibold text-sm">
               {user.initials}
             </AvatarFallback>
           </Avatar>
