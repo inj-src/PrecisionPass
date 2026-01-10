@@ -23,8 +23,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 const mainNavItems = [
@@ -49,12 +51,14 @@ interface AppSidebarProps {
 
 export function AppSidebar({ user = { name: "Alex Smith", initials: "AS" } }: AppSidebarProps) {
   const pathname = usePathname();
+  const isMobile = useIsMobile();
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       {/* Sidebar Header - User Profile */}
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-3">
+          {isMobile && <SidebarTrigger />}
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback className="bg-linear-to-br from-amber-400 to-orange-500 text-white font-semibold text-sm">

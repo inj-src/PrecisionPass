@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -50,11 +51,16 @@ export default function FaceRegistrationPage() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Page Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b bg-background shrink-0">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Face Registration</h1>
-          <p className="text-sm text-muted-foreground">
-            Register new employee facial data for the attendance system.
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="md:hidden">
+            <SidebarTrigger />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Face Registration</h1>
+            <p className="text-sm text-muted-foreground">
+              Register new employee facial data for the attendance system.
+            </p>
+          </div>
         </div>
       </header>
 
