@@ -105,8 +105,6 @@ export default function LiveMonitorPage() {
             <div className="flex-1 min-h-0">
               <RecognitionFeed
                 recognitions={mockRecognitions}
-                onViewAll={() => console.log("View all")}
-                onDownloadReport={() => console.log("Download report")}
               />
             </div>
           </div>

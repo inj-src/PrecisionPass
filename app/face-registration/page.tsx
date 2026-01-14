@@ -11,10 +11,12 @@ import {
   ScanFace,
   ArrowRight,
   ArrowLeft,
+  Clock,
+  DollarSign,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { PageHeader } from "@/components/layout/page-header";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -50,19 +52,10 @@ export default function FaceRegistrationPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Page Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b bg-background shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="md:hidden">
-            <SidebarTrigger />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Face Registration</h1>
-            <p className="text-sm text-muted-foreground">
-              Register new employee facial data for the attendance system.
-            </p>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Face Registration"
+        description="Register new employee facial data for the attendance system."
+      />
 
       {/* Progress Stepper */}
       <div className="border-b bg-muted/30 px-6 py-6 shrink-0">
@@ -246,6 +239,49 @@ export default function FaceRegistrationPage() {
                         </label>
                       </div>
                     </RadioGroup>
+                  </Field>
+
+                  {/* Scheduled Check-in Time */}
+                  <Field>
+                    <FieldLabel htmlFor="checkInTime">Scheduled Check-in Time</FieldLabel>
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="checkInTime"
+                        placeholder="09:00 AM"
+                        defaultValue="09:00 AM"
+                        className="pl-9"
+                      />
+                    </div>
+                  </Field>
+
+                  {/* Scheduled Check-out Time */}
+                  <Field>
+                    <FieldLabel htmlFor="checkOutTime">Scheduled Check-out Time</FieldLabel>
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="checkOutTime"
+                        placeholder="06:00 PM"
+                        defaultValue="06:00 PM"
+                        className="pl-9"
+                      />
+                    </div>
+                  </Field>
+
+                  {/* Hourly Rate */}
+                  <Field>
+                    <FieldLabel htmlFor="hourlyRate">Hourly Rate ($)</FieldLabel>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="hourlyRate"
+                        type="text"
+                        placeholder="45.50"
+                        defaultValue="45.50"
+                        className="pl-9"
+                      />
+                    </div>
                   </Field>
                 </div>
               </div>
