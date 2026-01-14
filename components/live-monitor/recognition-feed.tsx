@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Clock, HelpCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import {
    Card,
    CardContent,
@@ -33,8 +33,8 @@ export function RecognitionFeed({
 }: RecognitionFeedProps) {
    return (
       <Card className="flex flex-col h-full overflow-hidden">
-         <CardHeader className=" border-b flex flex-row items-center justify-between space-y-0 bg-card">
-            <CardTitle className="text-sm font-semibold">
+         <CardHeader className="border-b flex flex-row items-center justify-between space-y-0 bg-card px-4 py-3 sm:px-6 sm:py-4">
+            <CardTitle className="text-xs sm:text-sm font-semibold">
                Recent Recognitions
             </CardTitle>
          </CardHeader>
@@ -75,11 +75,11 @@ function RecognitionItem({ recognition }: { recognition: Recognition }) {
          {/* Avatar */}
          <div className="relative shrink-0">
             {isUnknown ? (
-               <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center border-2 border-background">
-                  <HelpCircle className="h-5 w-5 text-destructive" />
+               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-destructive/20 flex items-center justify-center border-2 border-background">
+                  <HelpCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
                </div>
             ) : (
-                  <Avatar className="h-10 w-10 shadow-sm">
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shadow-sm">
                   <AvatarImage src={recognition.avatar} alt={recognition.name} />
                      <AvatarFallback >
                      {recognition.initials}
@@ -89,29 +89,29 @@ function RecognitionItem({ recognition }: { recognition: Recognition }) {
          </div>
 
          {/* Info */}
-         <div className="ml-3 flex-1 min-w-0">
-            <div className="flex justify-between items-baseline mb-0.5">
+         <div className="ml-2 sm:ml-3 flex-1 min-w-0">
+            <div className="flex justify-between items-baseline mb-0.5 gap-2">
                <p
                   className={cn(
-                     "text-sm font-medium truncate",
+                     "text-xs sm:text-sm font-medium truncate",
                      isUnknown ? "text-destructive" : "text-foreground"
                   )}
                >
-                  {isUnknown ? "Unknown Person" : recognition.name}
+                  {isUnknown ? "Unknown" : recognition.name}
                </p>
-               <span className={timeClass}>
+               <span className={cn(timeClass, "text-[10px] sm:text-xs shrink-0")}>
                   {isLive ? "Now" : recognition.time}
                </span>
             </div>
             <p
                className={cn(
-                  "text-xs truncate",
+                  "text-[10px] sm:text-xs truncate",
                   isUnknown ? "text-destructive/70" : "text-muted-foreground"
                )}
             >
                {isUnknown
-                  ? "Alert: Face not matched"
-                  : `${recognition.role} • ${isLate ? "Late Entry" : "Entry"}`}
+                  ? "Face not matched"
+                  : `${recognition.role} • ${isLate ? "Late" : "Entry"}`}
             </p>
          </div>
       </div>

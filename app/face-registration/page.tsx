@@ -116,7 +116,7 @@ export default function FaceRegistrationPage() {
                   {/* Connector Line */}
                   {index < steps.length - 1 && (
                     <div className="flex-1 mx-4 sm:mx-8">
-                      <div className="h-1 rounded-full bg-muted overflow-hidden">
+                      <div className="h-1 rounded-full bg-muted relative overflow-hidden">
                         <div
                           className={cn(
                             "h-full bg-success transition-all duration-500 ease-out",
@@ -139,9 +139,9 @@ export default function FaceRegistrationPage() {
           {/* Section 1: Employee Details */}
           {currentStep === 1 && (
             <div className="animate-in fade-in slide-in-from-left-4 duration-300">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Employee Details</h2>
-                <p className="text-muted-foreground mt-1">
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Employee Details</h2>
+                <p className="text-muted-foreground text-sm mt-1">
                   Please fill in the personal information accurately.
                 </p>
               </div>
@@ -291,9 +291,9 @@ export default function FaceRegistrationPage() {
           {/* Section 2: Facial Data */}
           {currentStep === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Facial Data</h2>
-                <p className="text-muted-foreground mt-1">
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Facial Data</h2>
+                <p className="text-muted-foreground text-sm mt-1">
                   Capture or upload facial data for biometric recognition.
                 </p>
               </div>

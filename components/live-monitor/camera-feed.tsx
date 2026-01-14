@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Video, Maximize2 } from "lucide-react";
+import { Video } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface BoundingBox {
@@ -49,20 +48,20 @@ export function CameraFeed({
    return (
       <Card className="flex flex-col h-full overflow-hidden py-0 gap-0">
          {/* Stream Header */}
-         <CardHeader className="py-5 px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
+         <CardHeader className="py-3 sm:py-5 px-3 sm:px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
             <div className="flex items-center gap-2">
-               <Video className="h-4 w-4 text-muted-foreground" />
-               <span className="text-sm font-medium">Camera Stream</span>
+               <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+               <span className="text-xs sm:text-sm font-medium">Camera Stream</span>
             </div>
             <div className="flex items-center gap-3">
-               <span className="text-xs text-muted-foreground font-mono">
+               <span className="text-[10px] sm:text-xs text-muted-foreground font-mono hidden sm:inline">
                   1920x1080 • 60FPS
                </span>
             </div>
          </CardHeader>
 
          {/* Video Feed Area */}
-         <CardContent className="flex-1 relative bg-black p-0 overflow-hidden group min-h-[400px]">
+         <CardContent className="flex-1 relative bg-black p-0 overflow-hidden group min-h-[250px] sm:min-h-[400px]">
             {/* Placeholder Feed Image - Replace with actual video stream */}
             <div className="absolute inset-0 bg-linear-to-br from-zinc-900 via-zinc-800 to-zinc-900 flex items-center justify-center">
                <div className="text-center space-y-4">
@@ -90,15 +89,15 @@ export function CameraFeed({
          </CardContent>
 
          {/* Controls Footer */}
-         <div className="h-12 bg-card border-t flex items-center px-4 justify-between">
-            <div className="flex items-center gap-4">
-               <span className="text-sm font-mono text-foreground">
+         <div className="h-10 sm:h-12 bg-card border-t flex items-center px-3 sm:px-4 justify-between">
+            <div className="flex items-center gap-2 sm:gap-4">
+               <span className="text-xs sm:text-sm font-mono text-foreground">
                   {formatDate(currentTime)}{" "}
-                  <span className="text-muted-foreground ml-2">{formatTime(currentTime)}</span>
+                  <span className="text-muted-foreground ml-1 sm:ml-2">{formatTime(currentTime)}</span>
                </span>
             </div>
 
-            <div className="text-xs text-muted-foreground font-medium">
+            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">
                Latency:{" "}
                <span
                   className={cn(

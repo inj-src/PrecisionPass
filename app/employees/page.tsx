@@ -1,7 +1,6 @@
 "use client";
 
 import { EmployeeDirectoryHeader } from "@/components/employees/employee-directory-header";
-import { EmployeeSearch } from "@/components/employees/employee-search";
 import { EmployeeTable, Employee } from "@/components/employees/employee-table";
 
 // Mock employee data
@@ -103,15 +102,7 @@ export default function EmployeesPage() {
          <EmployeeDirectoryHeader />
 
          {/* Main Content */}
-         <main className="flex-1 overflow-auto p-6 space-y-6">
-
-            {/* Search and Filters */}
-            <EmployeeSearch
-               onSearch={(query) => console.log("Search:", query)}
-               onFilter={() => console.log("Filter clicked")}
-               onExport={() => console.log("Export clicked")}
-               onAddEmployee={() => console.log("Add employee clicked")}
-            />
+         <main className="flex-1 overflow-auto p-4 md:p-6 space-y-4 md:space-y-6">
 
             {/* Employee Table */}
             <EmployeeTable

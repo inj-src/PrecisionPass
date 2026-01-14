@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ApertureIcon } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PageHeaderProps {
   title: string;

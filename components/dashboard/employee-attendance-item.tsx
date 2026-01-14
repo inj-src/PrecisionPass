@@ -42,37 +42,37 @@ export function EmployeeAttendanceItem({
 }: EmployeeAttendanceItemProps) {
   const config = statusConfig[employee.status];
   return (
-    <div className="flex items-center justify-between py-4 border-b last:border-b-0">
-      <div className="flex items-center gap-4">
+    <div className="flex items-start sm:items-center justify-between py-4 border-b last:border-b-0 gap-3">
+      <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
         {/* Avatar with online indicator for present */}
-        <div className="relative">
-          <Avatar className="h-10 w-10">
+        <div className="relative shrink-0">
+          <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
             <AvatarImage src={employee.avatar} alt={employee.name} />
-            <AvatarFallback className="bg-muted text-muted-foreground text-sm">
+            <AvatarFallback className="bg-muted text-muted-foreground text-xs sm:text-sm">
               {employee.initials}
             </AvatarFallback>
           </Avatar>
           {employee.status === "present" && (
-            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 border-2 border-card" />
+            <span className="absolute bottom-0 right-0 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-500 border-2 border-card" />
           )}
         </div>
 
         {/* Employee Info */}
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-foreground">{employee.name}</span>
-            <span className="text-sm text-muted-foreground">
+        <div className="space-y-1 min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-1 gap-y-0">
+            <span className="font-medium text-foreground text-sm sm:text-base">{employee.name}</span>
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               / {employee.department}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className={cn("text-xs", config.className)}>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <Badge variant="outline" className={cn("text-[10px] sm:text-xs px-1.5 sm:px-2", config.className)}>
               {config.label}
             </Badge>
             {employee.matchPercentage !== undefined && (
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
                 <svg
-                  className="h-3 w-3"
+                  className="h-2.5 w-2.5 sm:h-3 sm:w-3"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -81,33 +81,31 @@ export function EmployeeAttendanceItem({
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
-                {employee.matchPercentage}% Match
+                {employee.matchPercentage}%
               </span>
             )}
             {employee.noScan && (
-              <span className="text-xs text-muted-foreground">No scan detected</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground">No scan</span>
             )}
           </div>
         </div>
       </div>
 
       {/* Time / Action */}
-      <div className="text-right">
-
-            <p className="font-medium text-foreground">{employee.checkInTime}</p>
-            <p
-              className={cn(
-                "text-xs",
-                employee.lateMinutes
-                  ? "text-amber-600"
-                  : "text-muted-foreground"
-              )}
-            >
-              {employee.lateMinutes
-                ? `+${employee.lateMinutes}m late`
-                : "Check-in"}
-            </p>
-
+      <div className="text-right shrink-0">
+        <p className="font-medium text-foreground text-sm sm:text-base">{employee.checkInTime}</p>
+        <p
+          className={cn(
+            "text-[10px] sm:text-xs",
+            employee.lateMinutes
+              ? "text-amber-600"
+              : "text-muted-foreground"
+          )}
+        >
+          {employee.lateMinutes
+            ? `+${employee.lateMinutes}m late`
+            : "Check-in"}
+        </p>
       </div>
     </div>
   );

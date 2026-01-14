@@ -137,47 +137,48 @@ export function EmployeeTable({
   return (
     <>
       <Card>
-        <CardContent className="px-0">
+        <CardContent className="px-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
-                <TableHead className="text-xs uppercase tracking-wider pl-6">Employee</TableHead>
-                <TableHead className="text-xs uppercase tracking-wider">ID</TableHead>
-                <TableHead className="text-xs uppercase tracking-wider">Department</TableHead>
-                <TableHead className="text-xs uppercase tracking-wider text-right pr-6">Actions</TableHead>
+                <TableHead className="text-[10px] sm:text-xs uppercase tracking-wider pl-4 sm:pl-6 whitespace-nowrap">Employee</TableHead>
+                <TableHead className="text-[10px] sm:text-xs uppercase tracking-wider hidden sm:table-cell">ID</TableHead>
+                <TableHead className="text-[10px] sm:text-xs uppercase tracking-wider hidden md:table-cell">Department</TableHead>
+                <TableHead className="text-[10px] sm:text-xs uppercase tracking-wider text-right pr-4 sm:pr-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {employees.map((employee) => (
                 <TableRow key={employee.id}>
                   {/* Employee Info */}
-                  <TableCell className="pl-6">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
+                  <TableCell className="pl-4 sm:pl-6">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
                         <AvatarImage src={employee.avatar} alt={employee.name} />
-                        <AvatarFallback className="bg-muted text-muted-foreground text-sm font-medium">
+                        <AvatarFallback className="bg-muted text-muted-foreground text-xs sm:text-sm font-medium">
                           {employee.initials}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <p className="font-medium text-foreground">{employee.name}</p>
-                        <p className="text-sm text-muted-foreground">{employee.role}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground text-sm sm:text-base truncate">{employee.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{employee.role}</p>
+                        <p className="text-[10px] text-muted-foreground sm:hidden">{employee.employeeId}</p>
                       </div>
                     </div>
                   </TableCell>
 
-                  {/* Employee ID */}
-                  <TableCell>
-                    <p className="font-medium text-foreground">{employee.employeeId}</p>
+                  {/* Employee ID - Hidden on mobile */}
+                  <TableCell className="hidden sm:table-cell">
+                    <p className="font-medium text-foreground text-sm">{employee.employeeId}</p>
                   </TableCell>
 
-                  {/* Department */}
-                  <TableCell>
-                    <p className="text-foreground">{employee.department}</p>
+                  {/* Department - Hidden on tablet and below */}
+                  <TableCell className="hidden md:table-cell">
+                    <p className="text-foreground text-sm">{employee.department}</p>
                   </TableCell>
 
                   {/* Actions */}
-                  <TableCell className="text-right pr-6">
+                  <TableCell className="text-right pr-4 sm:pr-6">
                     <Button
                       variant="ghost"
                       size="icon-sm"
@@ -194,9 +195,9 @@ export function EmployeeTable({
         </CardContent>
 
         {/* Pagination Footer */}
-        <CardFooter className="flex items-center justify-between border-t px-6 py-4">
-          <p className="text-sm text-muted-foreground">
-            Showing {startEntry} to {endEntry} of {totalEntries.toLocaleString()} entries
+        <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t px-4 sm:px-6 py-3 sm:py-4">
+          <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+            Showing {startEntry}-{endEntry} of {totalEntries.toLocaleString()}
           </p>
           <div className="flex items-center gap-1">{renderPaginationButtons()}</div>
         </CardFooter>

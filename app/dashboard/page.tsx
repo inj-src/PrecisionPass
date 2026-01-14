@@ -5,8 +5,6 @@ import {
   DashboardHeader,
   EmployeeAttendance,
 } from "@/components/dashboard";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 
 const employeesData: EmployeeAttendance[] = [
   {
@@ -65,7 +63,7 @@ export default function DashboardPage() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto p-6 space-y-6">
+      <main className="flex-1 overflow-auto p-4 md:p-6 space-y-4 md:space-y-6">
 
 
         {/* Attendance Feed */}

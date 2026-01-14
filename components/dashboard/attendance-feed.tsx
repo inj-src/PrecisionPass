@@ -1,11 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Filter, LayoutGrid } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   EmployeeAttendanceItem,
   EmployeeAttendance,
@@ -32,30 +30,30 @@ export function AttendanceFeed({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-lg font-semibold">  {/* Tabs and Actions */}
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 space-y-0">
+        <div>  {/* Tabs and Actions */}
           <Tabs
             value={activeTab}
             onValueChange={(v) => setActiveTab(v as typeof activeTab)}
             className="w-auto"
           >
             <TabsList className="h-9">
-              <TabsTrigger value="all" className="text-sm">
+              <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">
                 All
               </TabsTrigger>
-              <TabsTrigger value="present" className="text-sm">
+              <TabsTrigger value="present" className="text-xs sm:text-sm px-2 sm:px-3">
                 Present
               </TabsTrigger>
-              <TabsTrigger value="late" className="text-sm">
+              <TabsTrigger value="late" className="text-xs sm:text-sm px-2 sm:px-3">
                 Late
               </TabsTrigger>
-              <TabsTrigger value="absent" className="text-sm">
+              <TabsTrigger value="absent" className="text-xs sm:text-sm px-2 sm:px-3">
                 Absent
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
+        </div>
+        <p className="text-xs sm:text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
       </CardHeader>
       <CardContent className="space-y-4">
 
