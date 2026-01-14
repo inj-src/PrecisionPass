@@ -4,7 +4,7 @@ export function EmployeeDirectoryHeader() {
   return (
     <PageHeader
       title="Employee Directory"
-      description="Manage employee records and biometric enrollment"
+      description="Manage employee records and enrollment"
     />
   );
 }

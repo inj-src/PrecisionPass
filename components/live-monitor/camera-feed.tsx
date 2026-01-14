@@ -15,13 +15,7 @@ interface BoundingBox {
    status: "identified" | "analyzing" | "unknown";
 }
 
-interface CameraFeedProps {
-   boundingBoxes?: BoundingBox[];
-}
-
-export function CameraFeed({
-   boundingBoxes = [],
-}: CameraFeedProps) {
+export function CameraFeed() {
    const [currentTime, setCurrentTime] = React.useState(new Date());
 
    // Update time every second
@@ -46,7 +40,7 @@ export function CameraFeed({
    };
 
    return (
-      <Card className="flex flex-col h-full overflow-hidden py-0 gap-0">
+      <Card className="flex flex-col overflow-hidden py-0 gap-0">
          {/* Stream Header */}
          <CardHeader className="py-3 sm:py-5 px-3 sm:px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
             <div className="flex items-center gap-2">
@@ -61,7 +55,7 @@ export function CameraFeed({
          </CardHeader>
 
          {/* Video Feed Area */}
-         <CardContent className="flex-1 relative bg-black p-0 overflow-hidden group min-h-[250px] sm:min-h-[400px]">
+         <CardContent className="relative bg-black p-0 overflow-hidden group aspect-video">
             {/* Placeholder Feed Image - Replace with actual video stream */}
             <div className="absolute inset-0 bg-linear-to-br from-zinc-900 via-zinc-800 to-zinc-900 flex items-center justify-center">
                <div className="text-center space-y-4">
@@ -80,11 +74,6 @@ export function CameraFeed({
                      "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.6) 100%)",
                }}
             />
-
-            {/* Bounding Boxes */}
-            {boundingBoxes.map((box) => (
-               <BoundingBoxOverlay key={box.id} box={box} />
-            ))}
 
          </CardContent>
 

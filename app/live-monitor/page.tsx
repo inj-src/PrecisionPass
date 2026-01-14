@@ -62,24 +62,6 @@ const mockRecognitions: Recognition[] = [
   },
 ];
 
-// Mock bounding boxes for face detection overlay
-const mockBoundingBoxes = [
-  {
-    id: "bb1",
-    name: "Sarah Jenkins",
-    employeeId: "#8821",
-    confidence: 98,
-    position: { top: "25%", left: "30%" },
-    size: { width: "120px", height: "140px" },
-    status: "identified" as const,
-  },
-  {
-    id: "bb2",
-    position: { top: "32%", left: "68%" },
-    size: { width: "90px", height: "100px" },
-    status: "analyzing" as const,
-  },
-];
 
 export default function LiveMonitorPage() {
   return (
@@ -94,7 +76,6 @@ export default function LiveMonitorPage() {
           {/* Camera Feed - Takes most of the space */}
           <div className="flex-1 min-w-0">
             <CameraFeed
-              boundingBoxes={mockBoundingBoxes}
             />
           </div>
 
