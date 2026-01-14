@@ -54,7 +54,7 @@ export default function FaceRegistrationPage() {
       {/* Page Header */}
       <PageHeader
         title="Face Registration"
-        description="Register new employee facial data for the attendance system."
+        description="Register new employee for the attendance system."
       />
 
       {/* Progress Stepper */}
@@ -119,7 +119,7 @@ export default function FaceRegistrationPage() {
                       <div className="h-1 isolate rounded-full bg-muted relative overflow-hidden">
                         <div
                           className={cn(
-                            "bg-gray-300  -z-10 absolute inset-0",
+                            "bg-gray-300 -z-10 absolute inset-0",
                           )}
                         />
                         <div

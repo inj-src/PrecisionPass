@@ -21,7 +21,7 @@ export function PageHeader({
       <div className="flex items-center gap-3 md:hidden">
         <ApertureIcon />
         <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
-          <span className="font-medium text-base sm:text-xl text-foreground">Precision Pass</span>
+          <span className="font-medium text-lg text-foreground">Precision Pass</span>
         </div>
         <SidebarTrigger className="ml-auto" />
       </div>
