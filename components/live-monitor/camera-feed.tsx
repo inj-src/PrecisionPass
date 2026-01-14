@@ -42,7 +42,7 @@ export function CameraFeed() {
    return (
       <Card className="flex flex-col overflow-hidden py-0 gap-0">
          {/* Stream Header */}
-         <CardHeader className="py-3 sm:py-5 px-3 sm:px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
+         <CardHeader className="pt-3 [.border-b]:pb-3 px-3 sm:px-4 border-b flex flex-row items-center justify-between space-y-0 bg-card">
             <div className="flex items-center gap-2">
                <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                <span className="text-xs sm:text-sm font-medium">Camera Stream</span>

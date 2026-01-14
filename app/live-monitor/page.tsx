@@ -71,7 +71,7 @@ export default function LiveMonitorPage() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden p-4 md:p-6">
+      <main className="flex-1 h-full overflow-hidden p-4 md:p-6">
         <div className="flex flex-col lg:flex-row gap-4 md:gap-6 h-full">
           {/* Camera Feed - Takes most of the space */}
           <div className="flex-1 min-w-0">

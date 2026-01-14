@@ -29,7 +29,7 @@ export function AttendanceFeed({
   }, [employees, activeTab]);
 
   return (
-    <Card>
+    <Card className="pb-4 gap-4 lg:gap-6">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 space-y-0">
         <div>  {/* Tabs and Actions */}
           <Tabs
@@ -55,7 +55,7 @@ export function AttendanceFeed({
         </div>
         <p className="text-xs sm:text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-0">
 
 
         {/* Employee List */}
