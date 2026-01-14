@@ -33,7 +33,7 @@ export function RecognitionFeed({
 }: RecognitionFeedProps) {
    return (
       <Card className="flex flex-col h-full overflow-hidden gap-0 py-2">
-         <CardHeader className="border-b px-3 pt-4 [.border-b]:pb-4">
+         <CardHeader className="border-b px-4 pt-4 [.border-b]:pb-4">
             <CardTitle className="text-xs sm:text-sm font-semibold">
                Recent Recognitions
             </CardTitle>

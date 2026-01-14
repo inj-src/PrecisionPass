@@ -136,7 +136,7 @@ export function EmployeeTable({
 
   return (
     <>
-      <Card>
+      <Card className="py-2 lg:py-6">
         <CardContent className="px-0 overflow-x-auto">
           <Table>
             <TableHeader>

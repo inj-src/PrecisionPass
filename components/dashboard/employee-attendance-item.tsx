@@ -42,7 +42,9 @@ export function EmployeeAttendanceItem({
 }: EmployeeAttendanceItemProps) {
   const config = statusConfig[employee.status];
   return (
-    <div className="flex items-start sm:items-center justify-between py-4 border-b last:border-b-0 gap-3">
+    <div className="border-b last:border-b-0">
+
+      <div className="flex items-start sm:items-center px-4 lg:px-6 justify-between py-4 gap-3">
       <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
         {/* Avatar with online indicator for present */}
         <div className="relative shrink-0">
@@ -108,5 +110,7 @@ export function EmployeeAttendanceItem({
         </p>
       </div>
     </div>
+    </div>
+
   );
 }

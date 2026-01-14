@@ -139,7 +139,7 @@ export default function FaceRegistrationPage() {
       </div>
 
       {/* Content Area */}
-      <main className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto p-6 px-4 lg:px-6">
         <div className="max-w-5xl mx-auto">
           {/* Section 1: Employee Details */}
           {currentStep === 1 && (
@@ -151,7 +151,7 @@ export default function FaceRegistrationPage() {
                 </p>
               </div>
 
-              <div className="bg-card border rounded-xl p-6 sm:p-8">
+              <div className="bg-card border rounded-xl p-6  sm:p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* First Name */}
                   <Field>
