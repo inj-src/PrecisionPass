@@ -1,11 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Filter, LayoutGrid } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   EmployeeAttendanceItem,
   EmployeeAttendance,
@@ -15,14 +13,12 @@ import {
 interface AttendanceFeedProps {
   employees: EmployeeAttendance[];
   lastUpdated?: string;
-  onLoadMore?: () => void;
   onLogReason?: (id: string) => void;
 }
 
 export function AttendanceFeed({
   employees,
   lastUpdated = "Just now",
-  onLoadMore,
   onLogReason,
 }: AttendanceFeedProps) {
   const [activeTab, setActiveTab] = React.useState<"all" | AttendanceStatus>("all");
@@ -34,43 +30,33 @@ export function AttendanceFeed({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-semibold">Live Attendance Feed</CardTitle>
-        <p className="text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Tabs and Actions */}
-        <div className="flex items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 space-y-0">
+        <div>  {/* Tabs and Actions */}
           <Tabs
             value={activeTab}
             onValueChange={(v) => setActiveTab(v as typeof activeTab)}
             className="w-auto"
           >
             <TabsList className="h-9">
-              <TabsTrigger value="all" className="text-sm">
+              <TabsTrigger value="all" className="text-xs sm:text-sm px-2 sm:px-3">
                 All
               </TabsTrigger>
-              <TabsTrigger value="present" className="text-sm">
+              <TabsTrigger value="present" className="text-xs sm:text-sm px-2 sm:px-3">
                 Present
               </TabsTrigger>
-              <TabsTrigger value="late" className="text-sm">
+              <TabsTrigger value="late" className="text-xs sm:text-sm px-2 sm:px-3">
                 Late
               </TabsTrigger>
-              <TabsTrigger value="absent" className="text-sm">
+              <TabsTrigger value="absent" className="text-xs sm:text-sm px-2 sm:px-3">
                 Absent
               </TabsTrigger>
             </TabsList>
           </Tabs>
-
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Filter className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
+        <p className="text-xs sm:text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+
 
         {/* Employee List */}
         <div className="divide-y">
@@ -83,18 +69,7 @@ export function AttendanceFeed({
           ))}
         </div>
 
-        {/* Load More */}
-        {onLoadMore && (
-          <div className="pt-2">
-            <Button
-              variant="ghost"
-              className="w-full text-muted-foreground hover:text-foreground"
-              onClick={onLoadMore}
-            >
-              Load more employees
-            </Button>
-          </div>
-        )}
+
       </CardContent>
     </Card>
   );

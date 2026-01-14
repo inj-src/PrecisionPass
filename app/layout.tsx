@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -26,6 +27,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
+      <head>
+        {process.env.NODE_ENV === "development" && (
+          <Script
+            src="//unpkg.com/react-grab/dist/index.global.js"
+            crossOrigin="anonymous"
+            strategy="beforeInteractive"
+          />
+        )}
+      </head>
       <body className="font-sans antialiased">
         {children}
       </body>

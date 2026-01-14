@@ -1,56 +1,10 @@
 "use client";
 
 import {
-  Users,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  TrendingUp,
-  AlertTriangle,
-} from "lucide-react";
-
-import {
-  StatsCard,
   AttendanceFeed,
-  SystemAlerts,
   DashboardHeader,
   EmployeeAttendance,
-  SystemAlert,
 } from "@/components/dashboard";
-
-// Sample data - in production this would come from an API
-const statsData = [
-  {
-    title: "Total Employees",
-    value: "124",
-    icon: Users,
-    subtitle: "+2 new this week",
-    subtitleIcon: TrendingUp,
-    subtitleVariant: "success" as const,
-  },
-  {
-    title: "Present Today",
-    value: "112",
-    icon: CheckCircle2,
-    subtitle: "90% attendance rate",
-    subtitleVariant: "muted" as const,
-  },
-  {
-    title: "Late Arrivals",
-    value: "8",
-    icon: Clock,
-    subtitle: "Needs review",
-    subtitleIcon: AlertTriangle,
-    subtitleVariant: "warning" as const,
-  },
-  {
-    title: "Absent",
-    value: "4",
-    icon: XCircle,
-    subtitle: "3 planned leaves",
-    subtitleVariant: "muted" as const,
-  },
-];
 
 const employeesData: EmployeeAttendance[] = [
   {
@@ -100,57 +54,24 @@ const employeesData: EmployeeAttendance[] = [
   },
 ];
 
-const alertsData: SystemAlert[] = [
-  {
-    id: "1",
-    title: "Camera #04 Offline",
-    message:
-      "The front desk camera (ID: CAM-04) stopped responding at 10:15 AM. Maintenance has been notified.",
-    severity: "warning",
-  },
-];
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 export default function DashboardPage() {
-  const today = new Date();
 
   return (
     <>
       {/* Header */}
       <DashboardHeader
-        title="Attendance Dashboard"
-        subtitle={`Overview of employee check-ins for today, ${formatDate(today)}.`}
-        onExport={() => console.log("Exporting report...")}
-        onSearch={(query) => console.log("Searching:", query)}
       />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto p-6 space-y-6">
-        {/* Stats Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statsData.map((stat) => (
-            <StatsCard key={stat.title} {...stat} />
-          ))}
-        </section>
+      <main className="flex-1 overflow-auto p-4 md:p-6 space-y-4 md:space-y-6">
+
 
         {/* Attendance Feed */}
         <AttendanceFeed
           employees={employeesData}
           lastUpdated="Just now"
-          onLoadMore={() => console.log("Loading more...")}
           onLogReason={(id) => console.log("Log reason for:", id)}
         />
-
-        {/* System Alerts */}
-        <SystemAlerts alerts={alertsData} />
       </main>
     </>
   );
