@@ -116,10 +116,15 @@ export default function FaceRegistrationPage() {
                   {/* Connector Line */}
                   {index < steps.length - 1 && (
                     <div className="flex-1 mx-4 sm:mx-8">
-                      <div className="h-1 rounded-full bg-muted relative overflow-hidden">
+                      <div className="h-1 isolate rounded-full bg-muted relative overflow-hidden">
                         <div
                           className={cn(
-                            "h-full bg-success transition-all duration-500 ease-out",
+                            "bg-gray-300  -z-10 absolute inset-0",
+                          )}
+                        />
+                        <div
+                          className={cn(
+                            "h-full z-20 bg-success transition-all duration-500 ease-out",
                             isCompleted ? "w-full" : "w-0"
                           )}
                         />

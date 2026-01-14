@@ -21,7 +21,7 @@ export function PageHeader({
       <div className="flex items-center gap-3 md:hidden">
         <ApertureIcon />
         <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
-          <span className="font-medium text-xl text-foreground">Precision Pass</span>
+          <span className="font-medium text-base sm:text-xl text-foreground">Precision Pass</span>
         </div>
         <SidebarTrigger className="ml-auto" />
       </div>
@@ -36,11 +36,11 @@ export function PageHeader({
           <div className="flex items-center gap-4">
 
             <div>
-              <h1 className="font-bold text-foreground text-xl">
+              <h1 className="font-bold text-foreground text-lg sm:text-xl">
                 {title}
               </h1>
               {description && (
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-xs sm:text-sm">
                   {description}
                 </p>
               )}
