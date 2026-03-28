@@ -1,0 +1,20 @@
+[
+  {
+    "id": "dd820623-9f59-4531-8249-76f2f51d4ccc",
+    "employeeId": "EMP-00123",
+    "fullName": "Injamul",
+    "timestamp": "2026-03-27T12:42:17",
+    "date": "2026-03-27",
+    "status": "late",
+    "confidence": 30.55
+  },
+  {
+    "id": "fc03e1b6-9cd8-408e-84f6-2917f17f5d37",
+    "employeeId": "EMP-00124",
+    "fullName": "Jonedoe",
+    "timestamp": "2026-03-27T12:52:30",
+    "date": "2026-03-27",
+    "status": "late",
+    "confidence": 19.52
+  }
+]

@@ -1,118 +1,87 @@
 "use client";
 
+import * as React from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
+
 import { EmployeeDirectoryHeader } from "@/components/employees/employee-directory-header";
 import { EmployeeTable, Employee } from "@/components/employees/employee-table";
-
-// Mock employee data
-const mockEmployees: Employee[] = [
-   {
-      id: "1",
-      name: "Sarah Jenkins",
-      role: "Senior Software Engineer",
-      avatar: undefined,
-      initials: "SJ",
-      employeeId: "ID-28491",
-      department: "Engineering",
-      biometricStatus: "enrolled",
-      attendanceStatus: "clocked-in",
-   },
-   {
-      id: "2",
-      name: "Michael Chen",
-      role: "Product Designer",
-      avatar: undefined,
-      initials: "MC",
-      employeeId: "ID-28495",
-      department: "Design",
-      biometricStatus: "update-required",
-      attendanceStatus: "away",
-   },
-   {
-      id: "3",
-      name: "Amanda Roe",
-      role: "HR Manager",
-      avatar: undefined,
-      initials: "AR",
-      employeeId: "ID-28502",
-      department: "People Operations",
-      biometricStatus: "enrolled",
-      attendanceStatus: "on-leave",
-   },
-   {
-      id: "4",
-      name: "Robert Wilson",
-      role: "Marketing Lead",
-      avatar: undefined,
-      initials: "RW",
-      employeeId: "ID-28510",
-      department: "Marketing",
-      biometricStatus: "pending",
-      attendanceStatus: "clocked-in",
-   },
-   {
-      id: "5",
-      name: "Emily Davis",
-      role: "Data Analyst",
-      avatar: undefined,
-      initials: "ED",
-      employeeId: "ID-28515",
-      department: "Analytics",
-      biometricStatus: "enrolled",
-      attendanceStatus: "clocked-in",
-   },
-   {
-      id: "6",
-      name: "James Miller",
-      role: "Sales Director",
-      avatar: undefined,
-      initials: "JM",
-      employeeId: "ID-28520",
-      department: "Sales",
-      biometricStatus: "enrolled",
-      attendanceStatus: "away",
-   },
-   {
-      id: "7",
-      name: "Lisa Wong",
-      role: "Backend Developer",
-      avatar: undefined,
-      initials: "LW",
-      employeeId: "ID-28525",
-      department: "Engineering",
-      biometricStatus: "enrolled",
-      attendanceStatus: "clocked-in",
-   },
-   {
-      id: "8",
-      name: "David Chen",
-      role: "DevOps Engineer",
-      avatar: undefined,
-      initials: "DC",
-      employeeId: "ID-28530",
-      department: "Engineering",
-      biometricStatus: "update-required",
-      attendanceStatus: "clocked-in",
-   },
-];
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { getEmployees, updateEmployee } from "@/lib/cv-api";
 
 export default function EmployeesPage() {
-   return (
-      <>
-         {/* Header */}
-         <EmployeeDirectoryHeader />
+  const [employees, setEmployees] = React.useState<Employee[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [savingEmployeeId, setSavingEmployeeId] = React.useState<string | null>(null);
 
-         {/* Main Content */}
-         <main className="flex-1 overflow-auto p-4 md:p-6 space-y-4 md:space-y-6">
+  const loadEmployees = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setEmployees(await getEmployees());
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Failed to load employees.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-            {/* Employee Table */}
-            <EmployeeTable
-               employees={mockEmployees}
-               totalEntries={1248}
-               currentPage={1}
-               totalPages={125}
-               onPageChange={(page) => console.log("Page:", page)}
-            />
-         </main>
-      </>
-   );
+  React.useEffect(() => {
+    void loadEmployees();
+  }, [loadEmployees]);
+
+  async function handleSaveSchedule(employeeId: string, schedule: Employee["schedule"]) {
+    try {
+      setSavingEmployeeId(employeeId);
+      const updatedEmployee = await updateEmployee(employeeId, { schedule });
+      setEmployees((currentEmployees) =>
+        currentEmployees.map((employee) =>
+          employee.id === employeeId ? updatedEmployee : employee
+        )
+      );
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Failed to save employee.");
+    } finally {
+      setSavingEmployeeId(null);
+    }
+  }
+
+  return (
+    <>
+      <EmployeeDirectoryHeader />
+
+      <main className="flex-1 space-y-4 overflow-auto p-4 md:space-y-6 md:p-6">
+        <div className="flex items-center justify-end">
+          <Button variant="outline" onClick={() => void loadEmployees()} disabled={loading}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
+
+        {error && (
+          <Card className="border-destructive/30 bg-destructive/5 py-4">
+            <CardContent className="flex items-center gap-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </CardContent>
+          </Card>
+        )}
+
+        {loading ? (
+          <Card className="py-10">
+            <CardContent className="text-center text-sm text-muted-foreground">
+              Loading employees...
+            </CardContent>
+          </Card>
+        ) : (
+          <EmployeeTable
+            employees={employees}
+            isSavingEmployeeId={savingEmployeeId}
+            onSaveSchedule={handleSaveSchedule}
+          />
+        )}
+      </main>
+    </>
+  );
 }

@@ -1,33 +1,37 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
-  Camera,
-  Upload,
-  Save,
-  CheckCircle2,
-  Circle,
-  User,
-  ScanFace,
-  ArrowRight,
+  AlertCircle,
   ArrowLeft,
-  Clock,
-  DollarSign,
+  ArrowRight,
+  Camera,
+  CheckCircle2,
+  LoaderCircle,
+  RefreshCw,
+  Save,
+  ScanFace,
+  User,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  createEmployee,
+  enrollEmployee,
+  getHealth,
+  updateEmployee,
+  type EmployeeRecord,
+  type EnrollmentResponse,
+  type HealthResponse,
+} from "@/lib/cv-api";
+import { captureVideoFrame } from "@/lib/video-frame";
 
 const steps = [
   { id: 1, label: "Employee Details", icon: User },
@@ -35,32 +39,166 @@ const steps = [
 ];
 
 export default function FaceRegistrationPage() {
+  const router = useRouter();
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [currentStep, setCurrentStep] = React.useState(1);
+  const [formData, setFormData] = React.useState({
+    employeeId: "",
+    fullName: "",
+    department: "",
+    checkInTime: "09:00",
+    checkOutTime: "18:00",
+  });
+  const [employee, setEmployee] = React.useState<EmployeeRecord | null>(null);
+  const [health, setHealth] = React.useState<HealthResponse | null>(null);
+  const [loadingHealth, setLoadingHealth] = React.useState(true);
+  const [cameraReady, setCameraReady] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [enrolling, setEnrolling] = React.useState(false);
+  const [enrollmentResult, setEnrollmentResult] = React.useState<EnrollmentResponse | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const hasEnrollmentSamples = Boolean(employee && employee.sampleCount > 0);
 
-  const handleNext = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+  const loadHealth = React.useCallback(async () => {
+    try {
+      setLoadingHealth(true);
+      setHealth(await getHealth());
+      setError(null);
+    } catch (healthError) {
+      setHealth(null);
+      setError(
+        healthError instanceof Error ? healthError.message : "Failed to reach the CV backend.",
+      );
+    } finally {
+      setLoadingHealth(false);
     }
-  };
+  }, []);
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+  React.useEffect(() => {
+    void loadHealth();
+  }, [loadHealth]);
+
+  React.useEffect(() => {
+    return () => {
+      const stream = videoRef.current?.srcObject;
+      if (stream instanceof MediaStream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  function updateField(name: keyof typeof formData, value: string) {
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  async function startCamera() {
+    if (cameraReady) {
+      return;
     }
-  };
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: "user",
+        },
+        audio: false,
+      });
+
+      if (!videoRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
+      setCameraReady(true);
+      setError(null);
+    } catch (cameraError) {
+      setError(
+        cameraError instanceof Error ? cameraError.message : "Failed to access the browser camera.",
+      );
+    }
+  }
+
+  async function handleDetailsSubmit(event?: React.FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    setSubmitting(true);
+    setEnrollmentResult(null);
+
+    try {
+      const payload = {
+        employeeId: formData.employeeId.trim(),
+        fullName: formData.fullName.trim(),
+        department: formData.department.trim(),
+        schedule: {
+          checkInTime: formData.checkInTime,
+          checkOutTime: formData.checkOutTime,
+        },
+      };
+
+      const savedEmployee = employee
+        ? await updateEmployee(employee.id, {
+            fullName: payload.fullName,
+            department: payload.department,
+            schedule: payload.schedule,
+          })
+        : await createEmployee(payload);
+
+      setEmployee(savedEmployee);
+      setError(null);
+      setCurrentStep(2);
+      await startCamera();
+      await loadHealth();
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Failed to save the employee.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleEnrollment() {
+    if (!employee || !videoRef.current) {
+      return;
+    }
+
+    try {
+      setEnrolling(true);
+      setError(null);
+      const frames: Blob[] = [];
+
+      for (let index = 0; index < 18; index += 1) {
+        frames.push(await captureVideoFrame(videoRef.current, { maxWidth: 720, quality: 0.85 }));
+        await new Promise((resolve) => window.setTimeout(resolve, 140));
+      }
+
+      const result = await enrollEmployee(employee.id, frames);
+      setEmployee(result.employee);
+      setEnrollmentResult(result);
+      await loadHealth();
+    } catch (enrollError) {
+      setError(
+        enrollError instanceof Error ? enrollError.message : "Failed to enroll face samples.",
+      );
+    } finally {
+      setEnrolling(false);
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Page Header */}
+    <div className="bg-background min-h-screen">
       <PageHeader
         title="Face Registration"
-        description="Register new employee for the attendance system."
+        description="Register employees in two steps: details first, then browser-based facial enrollment."
       />
 
-      {/* Progress Stepper */}
-      <div className="border-b bg-muted/30 px-6 py-6 shrink-0">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex items-center justify-between">
+      <div className="bg-muted/30 px-6 py-6 border-b">
+        <div className="mx-auto max-w-4xl">
+          <div className="flex justify-between items-center">
             {steps.map((step, index) => {
               const StepIcon = step.icon;
               const isCompleted = currentStep > step.id;
@@ -68,64 +206,61 @@ export default function FaceRegistrationPage() {
 
               return (
                 <React.Fragment key={step.id}>
-                  {/* Step Item */}
-                  <div
+                  <button
+                    type="button"
                     className={cn(
-                      "flex items-center gap-3 cursor-pointer transition-all duration-200",
-                      isCurrent && "scale-105"
+                      "flex items-center gap-3 transition-all duration-200 cursor-pointer",
+                      isCurrent && "scale-105",
                     )}
-                    onClick={() => setCurrentStep(step.id)}
+                    onClick={() => {
+                      if (step.id === 1 || employee) {
+                        setCurrentStep(step.id);
+                      }
+                    }}
                   >
-                    {/* Step Circle */}
                     <div
                       className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300",
+                        "flex justify-center items-center rounded-full w-12 h-12 transition-all duration-300",
                         isCompleted && "bg-success text-success-foreground",
                         isCurrent && "bg-primary text-primary-foreground ring-4 ring-primary/20",
-                        !isCompleted && !isCurrent && "bg-muted text-muted-foreground"
+                        !isCompleted && !isCurrent && "bg-muted text-muted-foreground",
                       )}
                     >
                       {isCompleted ? (
-                        <CheckCircle2 className="h-6 w-6" />
+                        <CheckCircle2 className="w-6 h-6" />
                       ) : (
-                        <StepIcon className="h-5 w-5" />
+                        <StepIcon className="w-5 h-5" />
                       )}
                     </div>
 
-                    {/* Step Label */}
-                    <div className="hidden sm:block">
+                    <div className="hidden sm:block text-left">
                       <p
                         className={cn(
-                          "text-xs font-medium uppercase tracking-wide",
-                          isCurrent ? "text-primary" : "text-muted-foreground"
+                          "font-medium text-xs uppercase tracking-wide",
+                          isCurrent ? "text-primary" : "text-muted-foreground",
                         )}
                       >
                         Step {step.id}
                       </p>
                       <p
                         className={cn(
-                          "text-sm font-semibold",
-                          isCurrent ? "text-foreground" : "text-muted-foreground"
+                          "font-semibold text-sm",
+                          isCurrent ? "text-foreground" : "text-muted-foreground",
                         )}
                       >
                         {step.label}
                       </p>
                     </div>
-                  </div>
+                  </button>
 
-                  {/* Connector Line */}
                   {index < steps.length - 1 && (
                     <div className="flex-1 mx-4 sm:mx-8">
-                      <div className="h-1 isolate rounded-full bg-muted relative overflow-hidden">
+                      <div className="isolate relative bg-muted rounded-full h-1 overflow-hidden">
+                        <div className="-z-10 absolute inset-0 bg-gray-300" />
                         <div
                           className={cn(
-                            "bg-gray-300 -z-10 absolute inset-0",
-                          )}
-                        />
-                        <div
-                          className={cn(
-                            "h-full z-20 bg-success transition-all duration-500 ease-out",
-                            isCompleted ? "w-full" : "w-0"
+                            "bg-success h-full transition-all duration-500 ease-out",
+                            isCompleted ? "w-full" : "w-0",
                           )}
                         />
                       </div>
@@ -138,283 +273,263 @@ export default function FaceRegistrationPage() {
         </div>
       </div>
 
-      {/* Content Area */}
-      <main className="flex-1 overflow-auto p-6 px-4 lg:px-6">
-        <div className="max-w-5xl mx-auto">
-          {/* Section 1: Employee Details */}
+      <main className="p-4 md:p-6">
+        <div className="mx-auto max-w-6xl">
           {currentStep === 1 && (
-            <div className="animate-in fade-in slide-in-from-left-4 duration-300">
-              <div className="mb-4 sm:mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Employee Details</h2>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Please fill in the personal information accurately.
-                </p>
-              </div>
+            <div className="slide-in-from-left-4 animate-in duration-300 fade-in">
+              <Card className="py-0">
+                <CardHeader className="py-4 border-b">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Save className="w-5 h-5" />
+                    Employee Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <form onSubmit={handleDetailsSubmit} className="space-y-5">
+                    <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-3">
+                      <Field>
+                        <FieldLabel htmlFor="employeeId">Employee ID</FieldLabel>
+                        <Input
+                          id="employeeId"
+                          value={formData.employeeId}
+                          onChange={(event) => updateField("employeeId", event.target.value)}
+                          placeholder="EMP-001"
+                          required
+                          disabled={Boolean(employee)}
+                        />
+                      </Field>
 
-              <div className="bg-card border rounded-xl p-6  sm:p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* First Name */}
-                  <Field>
-                    <FieldLabel htmlFor="firstName">First Name</FieldLabel>
-                    <Input id="firstName" placeholder="e.g. Jane" />
-                  </Field>
+                      <Field>
+                        <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
+                        <Input
+                          id="fullName"
+                          value={formData.fullName}
+                          onChange={(event) => updateField("fullName", event.target.value)}
+                          placeholder="Jane Doe"
+                          required
+                        />
+                      </Field>
 
-                  {/* Last Name */}
-                  <Field>
-                    <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
-                    <Input id="lastName" placeholder="e.g. Doe" />
-                  </Field>
+                      <Field>
+                        <FieldLabel htmlFor="department">Department</FieldLabel>
+                        <Input
+                          id="department"
+                          value={formData.department}
+                          onChange={(event) => updateField("department", event.target.value)}
+                          placeholder="Engineering"
+                          required
+                        />
+                      </Field>
 
-                  {/* Employee ID */}
-                  <Field>
-                    <FieldLabel htmlFor="employeeId">Employee ID</FieldLabel>
-                    <Input
-                      id="employeeId"
-                      placeholder="EMP-00123"
-                      defaultValue="EMP-00123"
-                    />
-                  </Field>
+                      <Field>
+                        <FieldLabel htmlFor="checkInTime">Scheduled Check-in</FieldLabel>
+                        <Input
+                          id="checkInTime"
+                          type="time"
+                          value={formData.checkInTime}
+                          onChange={(event) => updateField("checkInTime", event.target.value)}
+                          required
+                        />
+                      </Field>
 
-                  {/* Department */}
-                  <Field>
-                    <FieldLabel htmlFor="department">Department</FieldLabel>
-                    <Select defaultValue="engineering">
-                      <SelectTrigger id="department">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="engineering">Engineering</SelectItem>
-                        <SelectItem value="design">Design</SelectItem>
-                        <SelectItem value="marketing">Marketing</SelectItem>
-                        <SelectItem value="sales">Sales</SelectItem>
-                        <SelectItem value="hr">Human Resources</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-
-                  {/* Work Email */}
-                  <Field>
-                    <FieldLabel htmlFor="workEmail">Work Email</FieldLabel>
-                    <div className="relative">
-                      <Input
-                        id="workEmail"
-                        type="email"
-                        placeholder="jane.doe@company.com"
-                        className="pl-10"
-                      />
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="h-4 w-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-                          />
-                        </svg>
-                      </div>
+                      <Field>
+                        <FieldLabel htmlFor="checkOutTime">Scheduled Check-out</FieldLabel>
+                        <Input
+                          id="checkOutTime"
+                          type="time"
+                          value={formData.checkOutTime}
+                          onChange={(event) => updateField("checkOutTime", event.target.value)}
+                          required
+                        />
+                      </Field>
                     </div>
-                  </Field>
 
-                  {/* Access Level */}
-                  <Field>
-                    <FieldLabel>Access Level</FieldLabel>
-                    <RadioGroup defaultValue="standard" className="flex gap-6 mt-2">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="standard" id="standard" />
-                        <label
-                          htmlFor="standard"
-                          className="text-sm font-medium cursor-pointer"
-                        >
-                          Standard
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="admin" id="admin" />
-                        <label
-                          htmlFor="admin"
-                          className="text-sm font-medium cursor-pointer"
-                        >
-                          Admin
-                        </label>
-                      </div>
-                    </RadioGroup>
-                  </Field>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button type="submit" disabled={submitting}>
+                        {submitting ? (
+                          <>
+                            <LoaderCircle className="mr-2 w-4 h-4 animate-spin" />
+                            Saving
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 w-4 h-4" />
+                            {employee ? "Save & Continue" : "Create & Continue"}
+                          </>
+                        )}
+                      </Button>
 
-                  {/* Scheduled Check-in Time */}
-                  <Field>
-                    <FieldLabel htmlFor="checkInTime">Scheduled Check-in Time</FieldLabel>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        id="checkInTime"
-                        placeholder="09:00 AM"
-                        defaultValue="09:00 AM"
-                        className="pl-9"
-                      />
+                      {employee && <Badge variant="secondary">Created {employee.employeeId}</Badge>}
                     </div>
-                  </Field>
-
-                  {/* Scheduled Check-out Time */}
-                  <Field>
-                    <FieldLabel htmlFor="checkOutTime">Scheduled Check-out Time</FieldLabel>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        id="checkOutTime"
-                        placeholder="06:00 PM"
-                        defaultValue="06:00 PM"
-                        className="pl-9"
-                      />
-                    </div>
-                  </Field>
-
-                  {/* Hourly Rate */}
-                  <Field>
-                    <FieldLabel htmlFor="hourlyRate">Hourly Rate ($)</FieldLabel>
-                    <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        id="hourlyRate"
-                        type="text"
-                        placeholder="45.50"
-                        defaultValue="45.50"
-                        className="pl-9"
-                      />
-                    </div>
-                  </Field>
-                </div>
-              </div>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
           )}
 
-          {/* Section 2: Facial Data */}
           {currentStep === 2 && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="mb-4 sm:mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Facial Data</h2>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Capture or upload facial data for biometric recognition.
-                </p>
-              </div>
-
-              <div className="bg-card border rounded-xl p-6 sm:p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                  {/* Face Scan Preview */}
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <div className="relative w-48 h-48 flex items-center justify-center">
-                      {/* Corner brackets with animation */}
-                      <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-primary/60 rounded-tl-xl animate-pulse" />
-                      <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-primary/60 rounded-tr-xl animate-pulse" />
-                      <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-primary/60 rounded-bl-xl animate-pulse" />
-                      <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-primary/60 rounded-br-xl animate-pulse" />
-
-                      {/* Face placeholder */}
-                      <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center">
-                        <svg
-                          width="64"
-                          height="64"
-                          viewBox="0 0 48 48"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="text-muted-foreground"
-                        >
-                          <circle
-                            cx="24"
-                            cy="24"
-                            r="20"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            fill="none"
-                          />
-                          <circle cx="17" cy="20" r="2" fill="currentColor" />
-                          <circle cx="31" cy="20" r="2" fill="currentColor" />
-                          <path
-                            d="M17 30c2 3 5 4 7 4s5-1 7-4"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            fill="none"
-                          />
-                        </svg>
+            <div className="slide-in-from-right-4 animate-in duration-300 fade-in">
+              <div className="gap-6 grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+                <Card className="py-0">
+                  <CardHeader className="py-4 border-b">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ScanFace className="w-5 h-5" />
+                      Face Enrollment
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 p-6">
+                    <div className="bg-black border rounded-xl overflow-hidden">
+                      <div className="relative aspect-video">
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          muted
+                          playsInline
+                          className={`absolute inset-0 h-full w-full object-cover ${cameraReady ? "opacity-100" : "opacity-0"}`}
+                        />
+                        {!cameraReady && (
+                          <div className="absolute inset-0 flex flex-col justify-center items-center gap-4 px-6 text-zinc-300 text-center">
+                            <Camera className="w-10 h-10 text-zinc-500" />
+                            <p className="text-sm">
+                              Start the browser camera to capture enrollment samples.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-6">
-                      Position your face within the frame
-                    </p>
-                  </div>
 
-                  {/* Action Buttons & Instructions */}
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Button size="lg" className="w-full">
-                        <Camera className="h-5 w-5 mr-2" />
-                        Activate Camera
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button variant="outline" onClick={() => void startCamera()}>
+                        <Camera className="mr-2 w-4 h-4" />
+                        {cameraReady ? "Camera Ready" : "Start Camera"}
                       </Button>
-                      <Button variant="outline" size="lg" className="w-full">
-                        <Upload className="h-5 w-5 mr-2" />
-                        Upload Photo
+
+                      <Button
+                        onClick={() => void handleEnrollment()}
+                        disabled={!employee || !cameraReady || enrolling}
+                      >
+                        {enrolling ? (
+                          <>
+                            <LoaderCircle className="mr-2 w-4 h-4 animate-spin" />
+                            Capturing 18 Samples
+                          </>
+                        ) : (
+                          <>
+                            <ScanFace className="mr-2 w-4 h-4" />
+                            Capture And Enroll
+                          </>
+                        )}
                       </Button>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    {/* Instructions */}
-                    <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                      <h4 className="font-semibold text-sm">Photo Guidelines</h4>
-                      <ul className="text-sm text-muted-foreground space-y-2">
-                        <li className="flex items-center gap-2">
-                          <Circle className="h-1.5 w-1.5 fill-current" />
-                          Ensure good lighting on your face
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Circle className="h-1.5 w-1.5 fill-current" />
-                          Remove glasses or accessories
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Circle className="h-1.5 w-1.5 fill-current" />
-                          Look directly at the camera
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Circle className="h-1.5 w-1.5 fill-current" />
-                          Keep a neutral expression
-                        </li>
-                      </ul>
+                <Card className="py-0">
+                  <CardHeader className="py-4 border-b">
+                    <CardTitle className="text-lg">Registration Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 p-6">
+                    <div className="bg-muted/30 p-4 border rounded-lg text-sm">
+                      <p className="font-medium text-foreground">
+                        {formData.fullName || "Unnamed employee"}
+                      </p>
+                      <p className="mt-1 text-muted-foreground">
+                        {formData.employeeId || "No employee ID"} •{" "}
+                        {formData.department || "No department"}
+                      </p>
+                      <p className="mt-1 text-muted-foreground">
+                        Schedule {formData.checkInTime} - {formData.checkOutTime}
+                      </p>
                     </div>
-                  </div>
-                </div>
+
+                    <div className="bg-muted/30 p-4 border rounded-lg text-muted-foreground text-sm">
+                      <p className="font-medium text-foreground">Enrollment flow</p>
+                      <p className="mt-1">
+                        Keep the facing the camera and make small head movements while the app
+                        captures 18 frames for upload.
+                      </p>
+                    </div>
+
+                    {employee && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant={employee.faceEnrolled ? "default" : "outline"}>
+                          {employee.faceEnrolled
+                            ? `${employee.sampleCount} samples saved`
+                            : "No samples yet"}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {enrollmentResult && (
+                      <div className="bg-success/5 p-4 border border-success/30 rounded-lg">
+                        <div className="flex items-center gap-2 font-medium text-foreground text-sm">
+                          <CheckCircle2 className="w-4 h-4 text-success" />
+                          Enrollment complete
+                        </div>
+                        <p className="mt-2 text-muted-foreground text-sm">
+                          Accepted {enrollmentResult.acceptedCount} sample
+                          {enrollmentResult.acceptedCount === 1 ? "" : "s"} and rejected{" "}
+                          {enrollmentResult.rejectedCount}.
+                        </p>
+                        {enrollmentResult.rejectedReasons.length > 0 && (
+                          <ul className="space-y-1 mt-3 text-muted-foreground text-xs">
+                            {enrollmentResult.rejectedReasons.slice(0, 5).map((reason) => (
+                              <li key={reason}>{reason}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
 
-          {/* Navigation Buttons */}
-          <div className="flex items-center justify-between mt-8">
+          <div className="flex justify-between items-center mt-8">
             <Button
               variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
-              className="gap-2"
+              onClick={() => setCurrentStep(1)}
+              disabled={currentStep === 1 || submitting || enrolling}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="mr-2 w-4 h-4" />
               Previous
             </Button>
 
-            {currentStep < steps.length ? (
-              <Button onClick={handleNext} className="gap-2">
-                Next Step
-                <ArrowRight className="h-4 w-4" />
+            {currentStep === 1 ? (
+              <Button onClick={() => void handleDetailsSubmit()} disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <LoaderCircle className="mr-2 w-4 h-4 animate-spin" />
+                    Saving
+                  </>
+                ) : (
+                  <>
+                    Next Step
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </>
+                )}
               </Button>
             ) : (
-              <Button className="gap-2">
-                <Save className="h-4 w-4" />
+              <Button
+                onClick={() => router.push("/employes")}
+                disabled={!hasEnrollmentSamples || enrolling}
+              >
+                <CheckCircle2 className="mr-2 w-4 h-4" />
                 Complete Registration
               </Button>
             )}
           </div>
         </div>
+
+        {error && (
+          <Card className="bg-destructive/5 mx-auto mt-6 py-4 border-destructive/30 max-w-6xl">
+            <CardContent className="flex items-center gap-3 text-destructive text-sm">
+              <AlertCircle className="w-4 h-4" />
+              {error}
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   );
