@@ -7,13 +7,14 @@ import { EmployeeDirectoryHeader } from "@/components/employees/employee-directo
 import { EmployeeTable, Employee } from "@/components/employees/employee-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getEmployees, updateEmployee } from "@/lib/cv-api";
+import { deleteEmployee, getEmployees, updateEmployee } from "@/lib/cv-api";
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = React.useState<Employee[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [savingEmployeeId, setSavingEmployeeId] = React.useState<string | null>(null);
+  const [savingEmployeeId, setSavingEmployeeId] = React.useState<number | null>(null);
+  const [deletingEmployeeId, setDeletingEmployeeId] = React.useState<number | null>(null);
 
   const loadEmployees = React.useCallback(async () => {
     try {
@@ -31,19 +32,39 @@ export default function EmployeesPage() {
     void loadEmployees();
   }, [loadEmployees]);
 
-  async function handleSaveSchedule(employeeId: string, schedule: Employee["schedule"]) {
+  async function handleSaveSchedule(id: number, schedule: Employee["schedule"]) {
     try {
-      setSavingEmployeeId(employeeId);
-      const updatedEmployee = await updateEmployee(employeeId, { schedule });
+      setSavingEmployeeId(id);
+      const updatedEmployee = await updateEmployee(id, { schedule });
       setEmployees((currentEmployees) =>
-        currentEmployees.map((employee) =>
-          employee.id === employeeId ? updatedEmployee : employee
-        )
+        currentEmployees.map((employee) => (employee.id === id ? updatedEmployee : employee))
       );
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Failed to save employee.");
     } finally {
       setSavingEmployeeId(null);
+    }
+  }
+
+  async function handleDeleteEmployee(employee: Employee) {
+    const confirmed = window.confirm(
+      `Delete ${employee.fullName}? This also removes saved face samples and attendance records.`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingEmployeeId(employee.id);
+      setError(null);
+      await deleteEmployee(employee.id);
+      setEmployees((currentEmployees) =>
+        currentEmployees.filter((currentEmployee) => currentEmployee.id !== employee.id),
+      );
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Failed to delete employee.");
+    } finally {
+      setDeletingEmployeeId(null);
     }
   }
 
@@ -78,7 +99,9 @@ export default function EmployeesPage() {
           <EmployeeTable
             employees={employees}
             isSavingEmployeeId={savingEmployeeId}
+            isDeletingEmployeeId={deletingEmployeeId}
             onSaveSchedule={handleSaveSchedule}
+            onDeleteEmployee={handleDeleteEmployee}
           />
         )}
       </main>

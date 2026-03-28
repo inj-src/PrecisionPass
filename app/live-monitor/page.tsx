@@ -3,7 +3,6 @@
 import * as React from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
-import { LiveMonitorHeader } from "@/components/live-monitor/live-monitor-header";
 import { CameraFeed } from "@/components/live-monitor/camera-feed";
 import { RecognitionFeed } from "@/components/live-monitor/recognition-feed";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import {
   type RecognitionEvent,
 } from "@/lib/cv-api";
 import { captureVideoFrame } from "@/lib/video-frame";
+import { PageHeader } from "@/components/layout";
 
 export default function LiveMonitorPage() {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
@@ -37,7 +37,7 @@ export default function LiveMonitorPage() {
     } catch (healthError) {
       setHealth(null);
       setError(
-        healthError instanceof Error ? healthError.message : "Failed to reach the CV backend."
+        healthError instanceof Error ? healthError.message : "Failed to reach the CV backend.",
       );
     }
   }, []);
@@ -49,7 +49,7 @@ export default function LiveMonitorPage() {
       setError(
         recognitionError instanceof Error
           ? recognitionError.message
-          : "Failed to load recognitions."
+          : "Failed to load recognitions.",
       );
     }
   }, []);
@@ -81,7 +81,7 @@ export default function LiveMonitorPage() {
         setError(
           cameraError instanceof Error
             ? cameraError.message
-            : "Failed to access the browser camera."
+            : "Failed to access the browser camera.",
         );
         setCameraReady(false);
       }
@@ -135,7 +135,7 @@ export default function LiveMonitorPage() {
         setError(
           recognitionError instanceof Error
             ? recognitionError.message
-            : "Failed to analyze the current frame."
+            : "Failed to analyze the current frame.",
         );
       } finally {
         analysisInFlightRef.current = false;
@@ -150,14 +150,12 @@ export default function LiveMonitorPage() {
 
   return (
     <>
-      <LiveMonitorHeader
-        backendOnline={Boolean(health)}
-        modelReady={health?.modelReady ?? false}
-        employeeCount={health?.employeeCount ?? 0}
+      <PageHeader
+        title="Live Camera Feed"
+        description="Browser camera preview with live recognition"
       />
-
-      <main className="flex-1 h-full overflow-hidden p-4 md:p-6">
-        <div className="mb-4 flex justify-end">
+      <main className="flex-1 p-4 md:p-6 h-full overflow-hidden">
+        <div className="flex justify-end mb-4">
           <Button
             variant="outline"
             onClick={() => {
@@ -165,22 +163,22 @@ export default function LiveMonitorPage() {
               void loadRecentRecognitions();
             }}
           >
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="mr-2 w-4 h-4" />
             Refresh
           </Button>
         </div>
 
         {error && (
-          <Card className="mb-4 border-destructive/30 bg-destructive/5 py-4">
-            <CardContent className="flex items-center gap-3 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4" />
+          <Card className="bg-destructive/5 mb-4 py-4 border-destructive/30">
+            <CardContent className="flex items-center gap-3 text-destructive text-sm">
+              <AlertCircle className="w-4 h-4" />
               {error}
             </CardContent>
           </Card>
         )}
 
-        <div className="flex h-full flex-col gap-4 md:gap-6 lg:flex-row">
-          <div className="min-w-0 flex-1">
+        <div className="flex lg:flex-row flex-col gap-4 md:gap-6 h-full">
+          <div className="flex-1 min-w-0">
             <CameraFeed
               videoRef={videoRef}
               detections={detections}
@@ -190,8 +188,8 @@ export default function LiveMonitorPage() {
             />
           </div>
 
-          <div className="flex w-full shrink-0 flex-col gap-4 lg:w-96">
-            <div className="min-h-0 flex-1">
+          <div className="flex flex-col gap-4 w-full lg:w-96 shrink-0">
+            <div className="flex-1 min-h-0">
               <RecognitionFeed recognitions={recognitions} />
             </div>
           </div>

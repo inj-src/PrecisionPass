@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,14 +20,18 @@ export type Employee = EmployeeRecord;
 
 interface EmployeeTableProps {
   employees: Employee[];
-  isSavingEmployeeId?: string | null;
-  onSaveSchedule: (employeeId: string, schedule: Schedule) => void;
+  isSavingEmployeeId?: number | null;
+  isDeletingEmployeeId?: number | null;
+  onSaveSchedule: (id: number, schedule: Schedule) => void;
+  onDeleteEmployee: (employee: Employee) => void;
 }
 
 export function EmployeeTable({
   employees,
   isSavingEmployeeId = null,
+  isDeletingEmployeeId = null,
   onSaveSchedule,
+  onDeleteEmployee,
 }: EmployeeTableProps) {
   const [selectedEmployee, setSelectedEmployee] = React.useState<Employee | null>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -86,7 +90,7 @@ export function EmployeeTable({
                         {employee.fullName}
                       </p>
                       <p className="truncate text-xs text-muted-foreground sm:text-sm">
-                        {employee.employeeId} • {employee.department}
+                        {employee.department}
                       </p>
                     </div>
                   </TableCell>
@@ -112,10 +116,26 @@ export function EmployeeTable({
                     </p>
                   </TableCell>
                   <TableCell className="pr-4 text-right sm:pr-6">
-                    <Button variant="outline" size="sm" onClick={() => handleEditClick(employee)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit Schedule
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditClick(employee)}
+                        disabled={employee.id === isDeletingEmployeeId}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Edit Schedule
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        aria-label={`Delete ${employee.fullName}`}
+                        onClick={() => onDeleteEmployee(employee)}
+                        disabled={employee.id === isDeletingEmployeeId}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

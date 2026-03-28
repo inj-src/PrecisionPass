@@ -43,7 +43,6 @@ export default function FaceRegistrationPage() {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [currentStep, setCurrentStep] = React.useState(1);
   const [formData, setFormData] = React.useState({
-    employeeId: "",
     fullName: "",
     department: "",
     checkInTime: "09:00",
@@ -132,7 +131,6 @@ export default function FaceRegistrationPage() {
 
     try {
       const payload = {
-        employeeId: formData.employeeId.trim(),
         fullName: formData.fullName.trim(),
         department: formData.department.trim(),
         schedule: {
@@ -288,18 +286,6 @@ export default function FaceRegistrationPage() {
                   <form onSubmit={handleDetailsSubmit} className="space-y-5">
                     <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-3">
                       <Field>
-                        <FieldLabel htmlFor="employeeId">Employee ID</FieldLabel>
-                        <Input
-                          id="employeeId"
-                          value={formData.employeeId}
-                          onChange={(event) => updateField("employeeId", event.target.value)}
-                          placeholder="EMP-001"
-                          required
-                          disabled={Boolean(employee)}
-                        />
-                      </Field>
-
-                      <Field>
                         <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
                         <Input
                           id="fullName"
@@ -359,7 +345,7 @@ export default function FaceRegistrationPage() {
                         )}
                       </Button>
 
-                      {employee && <Badge variant="secondary">Created {employee.employeeId}</Badge>}
+                      {employee && <Badge variant="secondary">Created employee #{employee.id}</Badge>}
                     </div>
                   </form>
                 </CardContent>
@@ -434,7 +420,6 @@ export default function FaceRegistrationPage() {
                         {formData.fullName || "Unnamed employee"}
                       </p>
                       <p className="mt-1 text-muted-foreground">
-                        {formData.employeeId || "No employee ID"} •{" "}
                         {formData.department || "No department"}
                       </p>
                       <p className="mt-1 text-muted-foreground">

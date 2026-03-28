@@ -89,7 +89,7 @@ export function CameraFeed({
 
         {detections.map((detection, index) => (
           <BoundingBoxOverlay
-            key={`${detection.employeeId ?? "unknown"}-${index}`}
+            key={`${detection.fullName ?? "unknown"}-${index}`}
             detection={detection}
           />
         ))}
@@ -149,7 +149,7 @@ function BoundingBoxOverlay({ detection }: { detection: RecognitionDetection }) 
           <div className="flex flex-col items-start leading-none">
             <span className="font-bold text-xs">{detection.fullName}</span>
             <span className="text-[10px] text-muted-foreground">
-              {detection.employeeId} • {detection.confidence?.toFixed(0)}%
+              {detection.confidence?.toFixed(0)}%
             </span>
           </div>
         </div>

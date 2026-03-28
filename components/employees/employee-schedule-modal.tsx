@@ -62,9 +62,7 @@ export function EmployeeScheduleModal({
 
         <div className="rounded-lg border bg-muted/30 p-3">
           <p className="font-medium text-foreground">{employee.fullName}</p>
-          <p className="text-sm text-muted-foreground">
-            {employee.employeeId} • {employee.department}
-          </p>
+          <p className="text-sm text-muted-foreground">{employee.department}</p>
         </div>
 
         <div className="space-y-4">

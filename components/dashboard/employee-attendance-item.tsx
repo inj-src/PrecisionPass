@@ -4,8 +4,7 @@ import { cn } from "@/lib/utils";
 export type AttendanceStatus = "present" | "late" | "absent";
 
 export interface EmployeeAttendance {
-  id: string;
-  employeeId: string;
+  id: number;
   fullName: string;
   department: string;
   status: AttendanceStatus;
@@ -52,9 +51,6 @@ export function EmployeeAttendanceItem({ employee }: EmployeeAttendanceItemProps
             <div className="flex flex-wrap items-center gap-2">
               <span className="whitespace-nowrap text-xs leading-none text-muted-foreground sm:text-sm">
                 {employee.department}
-              </span>
-              <span className="whitespace-nowrap text-xs leading-none text-muted-foreground sm:text-sm">
-                {employee.employeeId}
               </span>
               <span className="whitespace-nowrap text-xs leading-none text-muted-foreground sm:text-sm">
                 {employee.faceEnrolled ? `${employee.sampleCount} samples` : "Not enrolled"}

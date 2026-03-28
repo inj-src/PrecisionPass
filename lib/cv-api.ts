@@ -4,8 +4,7 @@ export interface Schedule {
 }
 
 export interface EmployeeRecord {
-  id: string;
-  employeeId: string;
+  id: number;
   fullName: string;
   department: string;
   schedule: Schedule;
@@ -39,7 +38,6 @@ export interface DetectionBox {
 export interface RecognitionDetection {
   status: "matched" | "unknown";
   box: DetectionBox;
-  employeeId: string | null;
   fullName: string | null;
   department: string | null;
   confidence: number | null;
@@ -48,8 +46,7 @@ export interface RecognitionDetection {
 }
 
 export interface AttendanceEvent {
-  id: string;
-  employeeId: string;
+  id: number;
   fullName: string;
   timestamp: string;
   date: string;
@@ -62,7 +59,6 @@ export interface RecognitionEvent {
   type: "recognized" | "unknown";
   timestamp: string;
   fullName: string | null;
-  employeeId: string | null;
   department: string | null;
   confidence: number | null;
   attendanceStatus: "present" | "late" | null;
@@ -75,8 +71,7 @@ export interface RecognitionFrameResponse {
 }
 
 export interface AttendanceTodayItem {
-  id: string;
-  employeeId: string;
+  id: number;
   fullName: string;
   department: string;
   status: "present" | "late" | "absent";
@@ -87,7 +82,6 @@ export interface AttendanceTodayItem {
 }
 
 export interface EmployeeCreateInput {
-  employeeId: string;
   fullName: string;
   department: string;
   schedule: Schedule;
@@ -119,6 +113,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(detail);
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return (await response.json()) as T;
 }
 
@@ -139,18 +137,24 @@ export async function createEmployee(input: EmployeeCreateInput): Promise<Employ
 }
 
 export async function updateEmployee(
-  employeeId: string,
+  id: number,
   input: Partial<Pick<EmployeeRecord, "fullName" | "department">> & { schedule?: Schedule },
 ): Promise<EmployeeRecord> {
-  return request<EmployeeRecord>(`/employees/${employeeId}`, {
+  return request<EmployeeRecord>(`/employees/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
 }
 
+export async function deleteEmployee(id: number): Promise<void> {
+  await request<void>(`/employees/${id}`, {
+    method: "DELETE",
+  });
+}
+
 export async function enrollEmployee(
-  employeeId: string,
+  id: number,
   frames: Blob[],
 ): Promise<EnrollmentResponse> {
   const formData = new FormData();
@@ -158,7 +162,7 @@ export async function enrollEmployee(
     formData.append("frames", frame, `frame-${index + 1}.jpg`);
   });
 
-  return request<EnrollmentResponse>(`/employees/${employeeId}/enroll`, {
+  return request<EnrollmentResponse>(`/employees/${id}/enroll`, {
     method: "POST",
     body: formData,
   });
