@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": 1,
+    "fullName": "Arafat Rahman",
+    "department": "CSE",
+    "schedule": {
+      "checkInTime": "09:00",
+      "checkOutTime": "18:00"
+    },
+    "faceEnrolled": true,
+    "sampleCount": 22,
+    "createdAt": "2026-03-30T12:45:58",
+    "updatedAt": "2026-03-30T12:46:33"
+  }
+]

@@ -42,3 +42,7 @@ next-env.d.ts
 __pycache__
 CV/data/face_samples/*
 !CV/data/face_samples/.gitkeep
+
+
+employees.json
+attendance.json

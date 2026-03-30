@@ -46,7 +46,7 @@ def list_employees() -> list[dict]:
     return sorted(employees, key=lambda employee: employee["fullName"].lower())
 
 
-def get_employee(employee_id: str) -> dict | None:
+def get_employee(employee_id: int) -> dict | None:
     with file_lock:
         employees = load_json(EMPLOYEES_PATH)
         for employee in employees:
@@ -79,7 +79,7 @@ def create_employee(payload: dict) -> dict:
     return employee
 
 
-def update_employee(employee_id: str, payload: dict) -> dict:
+def update_employee(employee_id: int, payload: dict) -> dict:
     with file_lock:
         employees = load_json(EMPLOYEES_PATH)
         for index, employee in enumerate(employees):
@@ -100,7 +100,7 @@ def update_employee(employee_id: str, payload: dict) -> dict:
     raise KeyError(employee_id)
 
 
-def delete_employee(employee_id: str) -> dict:
+def delete_employee(employee_id: int) -> dict:
     with file_lock:
         employees = load_json(EMPLOYEES_PATH)
         employee_to_delete: dict | None = None
@@ -139,7 +139,7 @@ def face_samples_dir(employee_id: int) -> Path:
     return path
 
 
-def update_employee_samples(employee_id: str, sample_count: int) -> dict:
+def update_employee_samples(employee_id: int, sample_count: int) -> dict:
     with file_lock:
         employees = load_json(EMPLOYEES_PATH)
         for index, employee in enumerate(employees):

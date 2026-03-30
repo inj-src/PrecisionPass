@@ -161,7 +161,7 @@ def create_employee(payload: EmployeeCreate) -> dict:
 
 
 @app.patch("/employees/{employee_id}", response_model=EmployeeRecord)
-def update_employee(employee_id: str, payload: EmployeeUpdate) -> dict:
+def update_employee(employee_id: int, payload: EmployeeUpdate) -> dict:
     try:
         return data.update_employee(employee_id, payload.model_dump(exclude_none=True))
     except KeyError as error:
@@ -169,7 +169,7 @@ def update_employee(employee_id: str, payload: EmployeeUpdate) -> dict:
 
 
 @app.delete("/employees/{employee_id}", status_code=204)
-def delete_employee(employee_id: str) -> None:
+def delete_employee(employee_id: int) -> None:
     try:
         data.delete_employee(employee_id)
     except KeyError as error:
@@ -181,7 +181,7 @@ def delete_employee(employee_id: str) -> None:
 
 @app.post("/employees/{employee_id}/enroll", response_model=EnrollmentResponse)
 async def enroll_employee(
-    employee_id: str,
+    employee_id: int,
     frames: list[UploadFile] = File(...),
 ) -> dict:
     employee = data.get_employee(employee_id)
