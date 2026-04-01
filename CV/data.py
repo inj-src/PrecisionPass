@@ -169,7 +169,7 @@ def record_attendance_if_first(
         return None
 
     attendance_event = {
-        "id": str(uuid.uuid4()),
+        # "id": str(uuid.uuid4()),
         "id": employee["id"],
         "fullName": employee["fullName"],
         "timestamp": timestamp.isoformat(timespec="seconds"),
