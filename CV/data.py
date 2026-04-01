@@ -4,7 +4,6 @@ from datetime import datetime
 import json
 from pathlib import Path
 import shutil
-from threading import Lock
 import uuid
 
 
@@ -13,8 +12,6 @@ DATA_DIR = BASE_DIR / "data"
 EMPLOYEES_PATH = DATA_DIR / "employees.json"
 ATTENDANCE_PATH = DATA_DIR / "attendance.json"
 FACE_SAMPLES_DIR = DATA_DIR / "face_samples"
-
-file_lock = Lock()
 
 
 def ensure_data_files() -> None:
@@ -41,24 +38,21 @@ def save_json(path: Path, rows: list[dict]) -> None:
 
 
 def list_employees() -> list[dict]:
-    with file_lock:
-        employees = load_json(EMPLOYEES_PATH)
+    employees = load_json(EMPLOYEES_PATH)
     return sorted(employees, key=lambda employee: employee["fullName"].lower())
 
 
 def get_employee(employee_id: int) -> dict | None:
-    with file_lock:
-        employees = load_json(EMPLOYEES_PATH)
-        for employee in employees:
-            if employee["id"] == employee_id:
-                return employee
+    employees = load_json(EMPLOYEES_PATH)
+    for employee in employees:
+        if employee["id"] == employee_id:
+            return employee
     return None
 
 
 def create_employee(payload: dict) -> dict:
-    with file_lock:
-        employees = load_json(EMPLOYEES_PATH)
-        next_id = max((int(current["id"]) for current in employees), default=-1) + 1
+    employees = load_json(EMPLOYEES_PATH)
+    next_id = max((int(current["id"]) for current in employees), default=-1) + 1
 
     now = datetime.now().isoformat(timespec="seconds")
     employee = {
@@ -72,58 +66,55 @@ def create_employee(payload: dict) -> dict:
         "updatedAt": now,
     }
 
-    with file_lock:
-        employees.append(employee)
-        save_json(EMPLOYEES_PATH, employees)
+    employees.append(employee)
+    save_json(EMPLOYEES_PATH, employees)
 
     return employee
 
 
 def update_employee(employee_id: int, payload: dict) -> dict:
-    with file_lock:
-        employees = load_json(EMPLOYEES_PATH)
-        for index, employee in enumerate(employees):
-            if employee["id"] != employee_id:
-                continue
+    employees = load_json(EMPLOYEES_PATH)
+    for index, employee in enumerate(employees):
+        if employee["id"] != employee_id:
+            continue
 
-            if payload.get("fullName") is not None:
-                employee["fullName"] = payload["fullName"]
-            if payload.get("department") is not None:
-                employee["department"] = payload["department"]
-            if payload.get("schedule") is not None:
-                employee["schedule"] = payload["schedule"]
-            employee["updatedAt"] = datetime.now().isoformat(timespec="seconds")
-            employees[index] = employee
-            save_json(EMPLOYEES_PATH, employees)
-            return employee
+        if payload.get("fullName") is not None:
+            employee["fullName"] = payload["fullName"]
+        if payload.get("department") is not None:
+            employee["department"] = payload["department"]
+        if payload.get("schedule") is not None:
+            employee["schedule"] = payload["schedule"]
+        employee["updatedAt"] = datetime.now().isoformat(timespec="seconds")
+        employees[index] = employee
+        save_json(EMPLOYEES_PATH, employees)
+        return employee
 
     raise KeyError(employee_id)
 
 
 def delete_employee(employee_id: int) -> dict:
-    with file_lock:
-        employees = load_json(EMPLOYEES_PATH)
-        employee_to_delete: dict | None = None
-        remaining_employees: list[dict] = []
+    employees = load_json(EMPLOYEES_PATH)
+    employee_to_delete: dict | None = None
+    remaining_employees: list[dict] = []
 
-        for employee in employees:
-            if employee["id"] == employee_id:
-                employee_to_delete = employee
-                continue
-            remaining_employees.append(employee)
+    for employee in employees:
+        if employee["id"] == employee_id:
+            employee_to_delete = employee
+            continue
+        remaining_employees.append(employee)
 
-        if employee_to_delete is None:
-            raise KeyError(employee_id)
+    if employee_to_delete is None:
+        raise KeyError(employee_id)
 
-        attendance_records = load_json(ATTENDANCE_PATH)
-        remaining_attendance = [
-            record
-            for record in attendance_records
-            if record["id"] != employee_to_delete["id"]
-        ]
+    attendance_records = load_json(ATTENDANCE_PATH)
+    remaining_attendance = [
+        record
+        for record in attendance_records
+        if record["id"] != employee_to_delete["id"]
+    ]
 
-        save_json(EMPLOYEES_PATH, remaining_employees)
-        save_json(ATTENDANCE_PATH, remaining_attendance)
+    save_json(EMPLOYEES_PATH, remaining_employees)
+    save_json(ATTENDANCE_PATH, remaining_attendance)
 
     sample_dir = FACE_SAMPLES_DIR / str(employee_to_delete["id"])
     if sample_dir.exists():
@@ -140,25 +131,23 @@ def face_samples_dir(employee_id: int) -> Path:
 
 
 def update_employee_samples(employee_id: int, sample_count: int) -> dict:
-    with file_lock:
-        employees = load_json(EMPLOYEES_PATH)
-        for index, employee in enumerate(employees):
-            if employee["id"] != employee_id:
-                continue
+    employees = load_json(EMPLOYEES_PATH)
+    for index, employee in enumerate(employees):
+        if employee["id"] != employee_id:
+            continue
 
-            employee["sampleCount"] = sample_count
-            employee["faceEnrolled"] = sample_count > 0
-            employee["updatedAt"] = datetime.now().isoformat(timespec="seconds")
-            employees[index] = employee
-            save_json(EMPLOYEES_PATH, employees)
-            return employee
+        employee["sampleCount"] = sample_count
+        employee["faceEnrolled"] = sample_count > 0
+        employee["updatedAt"] = datetime.now().isoformat(timespec="seconds")
+        employees[index] = employee
+        save_json(EMPLOYEES_PATH, employees)
+        return employee
 
     raise KeyError(employee_id)
 
 
 def list_attendance() -> list[dict]:
-    with file_lock:
-        attendance_records = load_json(ATTENDANCE_PATH)
+    attendance_records = load_json(ATTENDANCE_PATH)
     return sorted(attendance_records, key=lambda record: record["timestamp"], reverse=True)
 
 
@@ -171,24 +160,23 @@ def record_attendance_if_first(
 ) -> dict | None:
     target_date = timestamp.date().isoformat()
 
-    with file_lock:
-        attendance_records = load_json(ATTENDANCE_PATH)
-        already_recorded = any(
-            record["id"] == employee["id"] and record["date"] == target_date
-            for record in attendance_records
-        )
-        if already_recorded:
-            return None
+    attendance_records = load_json(ATTENDANCE_PATH)
+    already_recorded = any(
+        record["id"] == employee["id"] and record["date"] == target_date
+        for record in attendance_records
+    )
+    if already_recorded:
+        return None
 
-        attendance_event = {
-            "id": str(uuid.uuid4()),
-            "id": employee["id"],
-            "fullName": employee["fullName"],
-            "timestamp": timestamp.isoformat(timespec="seconds"),
-            "date": target_date,
-            "status": status,
-            "confidence": round(confidence, 2),
-        }
-        attendance_records.append(attendance_event)
-        save_json(ATTENDANCE_PATH, attendance_records)
-        return attendance_event
+    attendance_event = {
+        "id": str(uuid.uuid4()),
+        "id": employee["id"],
+        "fullName": employee["fullName"],
+        "timestamp": timestamp.isoformat(timespec="seconds"),
+        "date": target_date,
+        "status": status,
+        "confidence": round(confidence, 2),
+    }
+    attendance_records.append(attendance_event)
+    save_json(ATTENDANCE_PATH, attendance_records)
+    return attendance_event

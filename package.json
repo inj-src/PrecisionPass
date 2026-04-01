@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:backend": "python3 -m uvicorn CV.server:app --reload",
+    "dev:server": "python3 -m uvicorn CV.server:app --reload",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
