@@ -17,12 +17,16 @@ import { EmployeeScheduleModal } from "./employee-schedule-modal";
 import type { EmployeeRecord, Schedule } from "@/lib/cv-api";
 
 export type Employee = EmployeeRecord;
+export interface EmployeeEditData {
+  monthlyWage: number;
+  schedule: Schedule;
+}
 
 interface EmployeeTableProps {
   employees: Employee[];
   isSavingEmployeeId?: number | null;
   isDeletingEmployeeId?: number | null;
-  onSaveSchedule: (id: number, schedule: Schedule) => void;
+  onSaveSchedule: (id: number, data: EmployeeEditData) => void;
   onDeleteEmployee: (employee: Employee) => void;
 }
 
@@ -41,12 +45,12 @@ export function EmployeeTable({
     setModalOpen(true);
   }
 
-  function handleSaveSchedule(schedule: Schedule) {
+  function handleSaveSchedule(data: EmployeeEditData) {
     if (!selectedEmployee) {
       return;
     }
 
-    onSaveSchedule(selectedEmployee.id, schedule);
+    onSaveSchedule(selectedEmployee.id, data);
     setModalOpen(false);
   }
 
@@ -63,6 +67,9 @@ export function EmployeeTable({
                 <TableHead className="whitespace-nowrap text-[10px] uppercase tracking-wider sm:text-xs">
                   Schedule
                 </TableHead>
+                <TableHead className="hidden text-[10px] uppercase tracking-wider md:table-cell sm:text-xs">
+                  Wage
+                </TableHead>
                 <TableHead className="hidden text-[10px] uppercase tracking-wider sm:table-cell sm:text-xs">
                   Face Data
                 </TableHead>
@@ -77,7 +84,7 @@ export function EmployeeTable({
             <TableBody>
               {employees.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="px-6 py-10 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={6} className="px-6 py-10 text-center text-sm text-muted-foreground">
                     No employees found. Register an employee to get started.
                   </TableCell>
                 </TableRow>
@@ -99,6 +106,12 @@ export function EmployeeTable({
                       {employee.schedule.checkInTime} - {employee.schedule.checkOutTime}
                     </p>
                     <p className="text-xs text-muted-foreground">Check-in to check-out</p>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <p className="text-sm font-medium text-foreground">
+                      {employee.monthlyWage.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Monthly wage</p>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
                     <div className="flex items-center gap-2">
@@ -124,7 +137,7 @@ export function EmployeeTable({
                         disabled={employee.id === isDeletingEmployeeId}
                       >
                         <Pencil className="mr-2 h-4 w-4" />
-                        Edit Schedule
+                        Edit
                       </Button>
                       <Button
                         variant="destructive"

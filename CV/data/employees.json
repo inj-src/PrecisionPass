@@ -1,15 +1,72 @@
 [
   {
     "id": 0,
-    "fullName": "Injamul",
+    "fullName": "Md. Injamul Haque",
     "department": "Engineering",
+    "monthlyWage": 45000,
     "schedule": {
       "checkInTime": "09:00",
       "checkOutTime": "18:00"
     },
     "faceEnrolled": true,
     "sampleCount": 18,
-    "createdAt": "2026-04-01T14:34:50",
-    "updatedAt": "2026-04-01T14:35:08"
+    "createdAt": "2026-04-01T09:05:00",
+    "updatedAt": "2026-04-18T20:25:00"
+  },
+  {
+    "id": 1,
+    "fullName": "Tanvir Hasan Kaif",
+    "department": "Accounts",
+    "monthlyWage": 38000,
+    "schedule": {
+      "checkInTime": "09:30",
+      "checkOutTime": "18:00"
+    },
+    "faceEnrolled": true,
+    "sampleCount": 13,
+    "createdAt": "2026-04-01T09:10:00",
+    "updatedAt": "2026-04-18T20:25:00"
+  },
+  {
+    "id": 2,
+    "fullName": "Nusrat Jahan",
+    "department": "Human Resources",
+    "monthlyWage": 35000,
+    "schedule": {
+      "checkInTime": "09:00",
+      "checkOutTime": "17:30"
+    },
+    "faceEnrolled": false,
+    "sampleCount": 0,
+    "createdAt": "2026-04-02T10:15:00",
+    "updatedAt": "2026-04-18T20:25:00"
+  },
+  {
+    "id": 3,
+    "fullName": "Farhana Akter",
+    "department": "Sales",
+    "monthlyWage": 32000,
+    "schedule": {
+      "checkInTime": "10:00",
+      "checkOutTime": "18:30"
+    },
+    "faceEnrolled": false,
+    "sampleCount": 0,
+    "createdAt": "2026-04-02T10:20:00",
+    "updatedAt": "2026-04-18T20:25:00"
+  },
+  {
+    "id": 4,
+    "fullName": "Rakibul Islam",
+    "department": "Operations",
+    "monthlyWage": 30000,
+    "schedule": {
+      "checkInTime": "09:00",
+      "checkOutTime": "18:00"
+    },
+    "faceEnrolled": false,
+    "sampleCount": 0,
+    "createdAt": "2026-04-03T11:00:00",
+    "updatedAt": "2026-04-18T20:25:00"
   }
 ]

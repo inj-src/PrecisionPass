@@ -4,20 +4,20 @@ from datetime import datetime
 import json
 from pathlib import Path
 import shutil
-import uuid
 
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 EMPLOYEES_PATH = DATA_DIR / "employees.json"
 ATTENDANCE_PATH = DATA_DIR / "attendance.json"
+LEAVES_PATH = DATA_DIR / "leaves.json"
 FACE_SAMPLES_DIR = DATA_DIR / "face_samples"
 
 
 def ensure_data_files() -> None:
     DATA_DIR.mkdir(exist_ok=True)
     FACE_SAMPLES_DIR.mkdir(exist_ok=True)
-    for path in (EMPLOYEES_PATH, ATTENDANCE_PATH):
+    for path in (EMPLOYEES_PATH, ATTENDANCE_PATH, LEAVES_PATH):
         if not path.exists():
             path.write_text("[]\n", encoding="utf-8")
 
@@ -39,6 +39,8 @@ def save_json(path: Path, rows: list[dict]) -> None:
 
 def list_employees() -> list[dict]:
     employees = load_json(EMPLOYEES_PATH)
+    for employee in employees:
+        employee.setdefault("monthlyWage", 0)
     return sorted(employees, key=lambda employee: employee["fullName"].lower())
 
 
@@ -46,6 +48,7 @@ def get_employee(employee_id: int) -> dict | None:
     employees = load_json(EMPLOYEES_PATH)
     for employee in employees:
         if employee["id"] == employee_id:
+            employee.setdefault("monthlyWage", 0)
             return employee
     return None
 
@@ -59,6 +62,7 @@ def create_employee(payload: dict) -> dict:
         "id": next_id,
         "fullName": payload["fullName"],
         "department": payload["department"],
+        "monthlyWage": payload.get("monthlyWage", 0),
         "schedule": payload["schedule"],
         "faceEnrolled": False,
         "sampleCount": 0,
@@ -82,6 +86,8 @@ def update_employee(employee_id: int, payload: dict) -> dict:
             employee["fullName"] = payload["fullName"]
         if payload.get("department") is not None:
             employee["department"] = payload["department"]
+        if payload.get("monthlyWage") is not None:
+            employee["monthlyWage"] = payload["monthlyWage"]
         if payload.get("schedule") is not None:
             employee["schedule"] = payload["schedule"]
         employee["updatedAt"] = datetime.now().isoformat(timespec="seconds")
@@ -112,9 +118,16 @@ def delete_employee(employee_id: int) -> dict:
         for record in attendance_records
         if record["id"] != employee_to_delete["id"]
     ]
+    leave_records = load_json(LEAVES_PATH)
+    remaining_leaves = [
+        record
+        for record in leave_records
+        if record["employeeId"] != employee_to_delete["id"]
+    ]
 
     save_json(EMPLOYEES_PATH, remaining_employees)
     save_json(ATTENDANCE_PATH, remaining_attendance)
+    save_json(LEAVES_PATH, remaining_leaves)
 
     sample_dir = FACE_SAMPLES_DIR / str(employee_to_delete["id"])
     if sample_dir.exists():
@@ -149,6 +162,97 @@ def update_employee_samples(employee_id: int, sample_count: int) -> dict:
 def list_attendance() -> list[dict]:
     attendance_records = load_json(ATTENDANCE_PATH)
     return sorted(attendance_records, key=lambda record: record["timestamp"], reverse=True)
+
+
+def list_leaves() -> list[dict]:
+    leave_records = load_json(LEAVES_PATH)
+    employees_by_id = {employee["id"]: employee for employee in list_employees()}
+
+    enriched_records = []
+    for record in leave_records:
+        employee = employees_by_id.get(record["employeeId"])
+        enriched_records.append(
+            {
+                **record,
+                "employeeName": employee["fullName"] if employee else "Unknown employee",
+            }
+        )
+
+    return sorted(enriched_records, key=lambda record: record["startDate"], reverse=True)
+
+
+def create_leave(payload: dict) -> dict:
+    employee = get_employee(payload["employeeId"])
+    if employee is None:
+        raise KeyError(payload["employeeId"])
+
+    leave_records = load_json(LEAVES_PATH)
+    next_id = max((int(current["id"]) for current in leave_records), default=-1) + 1
+    now = datetime.now().isoformat(timespec="seconds")
+
+    leave_record = {
+        "id": next_id,
+        "employeeId": payload["employeeId"],
+        "startDate": payload["startDate"],
+        "endDate": payload["endDate"],
+        "reason": payload["reason"],
+        "status": "approved",
+        "createdAt": now,
+        "updatedAt": now,
+    }
+
+    leave_records.append(leave_record)
+    save_json(LEAVES_PATH, leave_records)
+    return {**leave_record, "employeeName": employee["fullName"]}
+
+
+def update_leave(leave_id: int, payload: dict) -> dict:
+    leave_records = load_json(LEAVES_PATH)
+
+    for index, leave_record in enumerate(leave_records):
+        if leave_record["id"] != leave_id:
+            continue
+
+        if payload.get("employeeId") is not None:
+            if get_employee(payload["employeeId"]) is None:
+                raise KeyError(payload["employeeId"])
+            leave_record["employeeId"] = payload["employeeId"]
+        if payload.get("startDate") is not None:
+            leave_record["startDate"] = payload["startDate"]
+        if payload.get("endDate") is not None:
+            leave_record["endDate"] = payload["endDate"]
+        if payload.get("reason") is not None:
+            leave_record["reason"] = payload["reason"]
+
+        leave_record["updatedAt"] = datetime.now().isoformat(timespec="seconds")
+        leave_records[index] = leave_record
+        save_json(LEAVES_PATH, leave_records)
+
+        employee = get_employee(leave_record["employeeId"])
+        return {
+            **leave_record,
+            "employeeName": employee["fullName"] if employee else "Unknown employee",
+        }
+
+    raise KeyError(leave_id)
+
+
+def delete_leave(leave_id: int) -> dict:
+    leave_records = load_json(LEAVES_PATH)
+    leave_to_delete: dict | None = None
+    remaining_leaves: list[dict] = []
+
+    for leave_record in leave_records:
+        if leave_record["id"] == leave_id:
+            leave_to_delete = leave_record
+            continue
+        remaining_leaves.append(leave_record)
+
+    if leave_to_delete is None:
+        raise KeyError(leave_id)
+
+    save_json(LEAVES_PATH, remaining_leaves)
+    return leave_to_delete
 
 
 def record_attendance_if_first(

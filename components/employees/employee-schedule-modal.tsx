@@ -15,12 +15,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { EmployeeRecord, Schedule } from "@/lib/cv-api";
 
+interface EmployeeEditData {
+  monthlyWage: number;
+  schedule: Schedule;
+}
+
 interface EmployeeScheduleModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   employee: EmployeeRecord | null;
   isSaving?: boolean;
-  onSave: (data: Schedule) => void;
+  onSave: (data: EmployeeEditData) => void;
 }
 
 export function EmployeeScheduleModal({
@@ -32,6 +37,7 @@ export function EmployeeScheduleModal({
 }: EmployeeScheduleModalProps) {
   const [checkInTime, setCheckInTime] = React.useState("09:00");
   const [checkOutTime, setCheckOutTime] = React.useState("18:00");
+  const [monthlyWage, setMonthlyWage] = React.useState("0");
 
   React.useEffect(() => {
     if (!employee) {
@@ -40,10 +46,14 @@ export function EmployeeScheduleModal({
 
     setCheckInTime(employee.schedule.checkInTime);
     setCheckOutTime(employee.schedule.checkOutTime);
+    setMonthlyWage(String(employee.monthlyWage ?? 0));
   }, [employee]);
 
   function handleSave() {
-    onSave({ checkInTime, checkOutTime });
+    onSave({
+      monthlyWage: Number(monthlyWage) || 0,
+      schedule: { checkInTime, checkOutTime },
+    });
   }
 
   if (!employee) {
@@ -54,9 +64,9 @@ export function EmployeeScheduleModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Employee Schedule</DialogTitle>
+          <DialogTitle>Edit Employee Payroll</DialogTitle>
           <DialogDescription>
-            Update the default check-in and check-out times used for attendance status.
+            Update the monthly wage and schedule used for attendance and salary calculation.
           </DialogDescription>
         </DialogHeader>
 
@@ -66,6 +76,18 @@ export function EmployeeScheduleModal({
         </div>
 
         <div className="space-y-4">
+          <div className="space-y-2">
+            <Label className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+              Monthly Wage
+            </Label>
+            <Input
+              type="number"
+              min="0"
+              value={monthlyWage}
+              onChange={(event) => setMonthlyWage(event.target.value)}
+            />
+          </div>
+
           <div className="space-y-2">
             <Label className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
               Scheduled Check-in Time

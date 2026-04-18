@@ -45,6 +45,7 @@ export default function FaceRegistrationPage() {
   const [formData, setFormData] = React.useState({
     fullName: "",
     department: "",
+    monthlyWage: "30000",
     checkInTime: "09:00",
     checkOutTime: "18:00",
   });
@@ -133,6 +134,7 @@ export default function FaceRegistrationPage() {
       const payload = {
         fullName: formData.fullName.trim(),
         department: formData.department.trim(),
+        monthlyWage: Number(formData.monthlyWage) || 0,
         schedule: {
           checkInTime: formData.checkInTime,
           checkOutTime: formData.checkOutTime,
@@ -143,6 +145,7 @@ export default function FaceRegistrationPage() {
         ? await updateEmployee(employee.id, {
             fullName: payload.fullName,
             department: payload.department,
+            monthlyWage: payload.monthlyWage,
             schedule: payload.schedule,
           })
         : await createEmployee(payload);
@@ -308,6 +311,19 @@ export default function FaceRegistrationPage() {
                       </Field>
 
                       <Field>
+                        <FieldLabel htmlFor="monthlyWage">Monthly Wage</FieldLabel>
+                        <Input
+                          id="monthlyWage"
+                          type="number"
+                          min="0"
+                          value={formData.monthlyWage}
+                          onChange={(event) => updateField("monthlyWage", event.target.value)}
+                          placeholder="30000"
+                          required
+                        />
+                      </Field>
+
+                      <Field>
                         <FieldLabel htmlFor="checkInTime">Scheduled Check-in</FieldLabel>
                         <Input
                           id="checkInTime"
@@ -421,6 +437,9 @@ export default function FaceRegistrationPage() {
                       </p>
                       <p className="mt-1 text-muted-foreground">
                         {formData.department || "No department"}
+                      </p>
+                      <p className="mt-1 text-muted-foreground">
+                        Monthly wage {Number(formData.monthlyWage || 0).toLocaleString()}
                       </p>
                       <p className="mt-1 text-muted-foreground">
                         Schedule {formData.checkInTime} - {formData.checkOutTime}

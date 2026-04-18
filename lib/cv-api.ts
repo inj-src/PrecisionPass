@@ -7,6 +7,7 @@ export interface EmployeeRecord {
   id: number;
   fullName: string;
   department: string;
+  monthlyWage: number;
   schedule: Schedule;
   faceEnrolled: boolean;
   sampleCount: number;
@@ -84,7 +85,48 @@ export interface AttendanceTodayItem {
 export interface EmployeeCreateInput {
   fullName: string;
   department: string;
+  monthlyWage: number;
   schedule: Schedule;
+}
+
+export interface LeaveRecord {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: "approved";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LeaveInput {
+  employeeId: number;
+  startDate: string;
+  endDate: string;
+  reason: string;
+}
+
+export interface PayrollItem {
+  employeeId: number;
+  fullName: string;
+  department: string;
+  monthlyWage: number;
+  dailyRate: number;
+  presentDays: number;
+  paidLeaveDays: number;
+  absentDays: number;
+  deduction: number;
+  netPay: number;
+}
+
+export interface PayrollResponse {
+  month: string;
+  totalGross: number;
+  totalDeduction: number;
+  totalNetPay: number;
+  employees: PayrollItem[];
 }
 
 const API_BASE_URL =
@@ -138,7 +180,9 @@ export async function createEmployee(input: EmployeeCreateInput): Promise<Employ
 
 export async function updateEmployee(
   id: number,
-  input: Partial<Pick<EmployeeRecord, "fullName" | "department">> & { schedule?: Schedule },
+  input: Partial<Pick<EmployeeRecord, "fullName" | "department" | "monthlyWage">> & {
+    schedule?: Schedule;
+  },
 ): Promise<EmployeeRecord> {
   return request<EmployeeRecord>(`/employees/${id}`, {
     method: "PATCH",
@@ -184,4 +228,34 @@ export async function getRecentRecognitions(limit = 20): Promise<RecognitionEven
 export async function getTodayAttendance(date?: string): Promise<AttendanceTodayItem[]> {
   const query = date ? `?date=${encodeURIComponent(date)}` : "";
   return request<AttendanceTodayItem[]>(`/attendance/today${query}`);
+}
+
+export async function getLeaves(): Promise<LeaveRecord[]> {
+  return request<LeaveRecord[]>("/leaves");
+}
+
+export async function createLeave(input: LeaveInput): Promise<LeaveRecord> {
+  return request<LeaveRecord>("/leaves", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function updateLeave(id: number, input: Partial<LeaveInput>): Promise<LeaveRecord> {
+  return request<LeaveRecord>(`/leaves/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function deleteLeave(id: number): Promise<void> {
+  await request<void>(`/leaves/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function getMonthlyPayroll(month: string): Promise<PayrollResponse> {
+  return request<PayrollResponse>(`/payroll/monthly?month=${encodeURIComponent(month)}`);
 }

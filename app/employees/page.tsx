@@ -32,10 +32,13 @@ export default function EmployeesPage() {
     void loadEmployees();
   }, [loadEmployees]);
 
-  async function handleSaveSchedule(id: number, schedule: Employee["schedule"]) {
+  async function handleSaveSchedule(
+    id: number,
+    data: { monthlyWage: number; schedule: Employee["schedule"] },
+  ) {
     try {
       setSavingEmployeeId(id);
-      const updatedEmployee = await updateEmployee(id, { schedule });
+      const updatedEmployee = await updateEmployee(id, data);
       setEmployees((currentEmployees) =>
         currentEmployees.map((employee) => (employee.id === id ? updatedEmployee : employee))
       );

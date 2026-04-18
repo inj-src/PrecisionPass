@@ -6,6 +6,8 @@ import {
   ScanFace,
   Video,
   ApertureIcon,
+  CalendarDays,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,6 +30,8 @@ const mainNavItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Video, label: "Live Monitor", href: "/live-monitor" },
   { icon: Users, label: "Employees", href: "/employees" },
+  { icon: CalendarDays, label: "Leave Management", href: "/leave-management" },
+  { icon: Wallet, label: "Payroll", href: "/payroll" },
   { icon: ScanFace, label: "Face Registry", href: "/face-registration" },
 ];
 
