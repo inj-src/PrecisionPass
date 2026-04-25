@@ -382,5 +382,13 @@
     "date": "2026-04-18",
     "status": "late",
     "confidence": 82.4
+  },
+  {
+    "id": 0,
+    "fullName": "Md. Injamul Haque",
+    "timestamp": "2026-04-25T18:35:17",
+    "date": "2026-04-25",
+    "status": "late",
+    "confidence": 14.32
   }
 ]
