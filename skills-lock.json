@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "codebase-to-course": {
+      "source": "zarazhangrui/codebase-to-course",
+      "sourceType": "github",
+      "computedHash": "3e3e7ff3976d392df02b1f5669223daa6564b0da8048d484346dc005829f6c52"
+    }
+  }
+}
