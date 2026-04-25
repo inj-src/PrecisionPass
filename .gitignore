@@ -42,7 +42,8 @@ next-env.d.ts
 __pycache__
 CV/data/face_samples/*
 !CV/data/face_samples/.gitkeep
+precision-pass-courses
 
-
+CV/data
 employees.json
 attendance.json
